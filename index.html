@@ -342,6 +342,7 @@ var VL = (function () {
     var platform = detectPlatform(hint), handle = '', url = '';
     var low = raw.toLowerCase();
     var isUrl = /^https?:\/\//.test(low) || /^(www\.|m\.)?(instagram\.com|youtube\.com|tiktok\.com|blog\.naver\.com|m\.blog\.naver\.com)/.test(low);
+    if (!isUrl && (/[\/:]/.test(low) || /^www\./.test(low))) return null;
     if (isUrl) {
       url = /^https?:\/\//.test(raw) ? raw : 'https://' + raw;
       var q = low.match(/blogid=([^&#]+)/);
@@ -352,7 +353,7 @@ var VL = (function () {
       else if (host.indexOf('youtube.com') >= 0) { platform = '유튜브'; handle = (p1 === 'channel' || p1 === 'c' || p1 === 'user') ? p2 : p1; }
       else if (host.indexOf('tiktok.com') >= 0) { platform = '틱톡'; handle = p1; }
       else if (host.indexOf('naver.com') >= 0) { platform = '블로그'; handle = q ? q[1] : p1; if (handle === 'postview.naver' || handle === 'postview.nhn') handle = q ? q[1] : ''; }
-      else { platform = platform || '기타'; handle = parts.join('/'); }
+      else { return null; }
     } else {
       handle = low;
     }
@@ -475,15 +476,22 @@ var VL = (function () {
   function guessCategory(text) { text = str(text); for (var i = 0; i < CAT_KW.length; i++) if (CAT_KW[i][1].test(text)) return CAT_KW[i][0]; return ''; }
   function parseIgDesc(desc, handle) {
     desc = decodeEnt(desc).replace(/\s+/g, ' ').trim();
-    var out = { ok: false };
-    var m = desc.match(/^([\d.,]+\s*[KMB]?)\s+Followers?,\s*([\d.,]+\s*[KMB]?)\s+Following,\s*([\d.,]+\s*[KMB]?)\s+Posts?\s*-\s*(?:See Instagram photos and videos from\s*)?(.*?)\s*\(@([^)]+)\)(?:\s*on Instagram:\s*["']([\s\S]*)["']\s*$)?/i);
-    var k = !m && desc.match(/팔로워\s*([\d.,]+\s*[만천억KMB]?)\s*명?,?\s*팔로잉\s*([\d.,]+\s*[만천KMB]?)\s*명?,?\s*게시물\s*([\d.,]+\s*[만천KMB]?)\s*개?\s*-\s*(.*?)\s*\(@([^)]+)\)(?:[^"']*["']([\s\S]*)["']\s*$)?/);
-    var r = m || k;
-    if (!r) return out;
-    if (handle && r[5].toLowerCase() !== String(handle).toLowerCase()) return out;
-    var bio = str(r[6]);
+    if (!desc) return { ok: false };
+    var num = function (re) { var m = desc.match(re); return m ? (m[1] || m[2] || '') : ''; };
+    var fol = num(/팔로워\s*([\d.,]+\s*[만천억KMB]?)|([\d.,]+\s*[KMB]?)\s+Followers?/i);
+    if (!fol) return { ok: false };
+    var fing = num(/팔로잉\s*([\d.,]+\s*[만천KMB]?)|([\d.,]+\s*[KMB]?)\s+Following/i);
+    var posts = num(/게시물\s*([\d.,]+\s*[만천KMB]?)|([\d.,]+\s*[KMB]?)\s+Posts?/i);
+    var dash = desc.indexOf(' - ');
+    var rest = dash >= 0 ? desc.slice(dash + 3) : desc;
+    var hm = rest.match(/@([A-Za-z0-9._]+)/);
+    var h = hm ? hm[1].toLowerCase() : '';
+    if (handle && h && h !== String(handle).toLowerCase()) return { ok: false };
+    var name = hm ? rest.slice(0, hm.index).replace(/^See Instagram photos and videos from\s*/i, '').replace(/[\s(]+$/, '').trim() : '';
+    var bm = rest.match(/(?:계정|Instagram)\s*[:：]\s*["'“‘]([\s\S]*)["'”’]\s*$/);
+    var bio = bm ? str(bm[1]) : '';
     var em = bio.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
-    return { ok: true, followers: toNum(r[1]), following: toNum(r[2]), posts: toNum(r[3]), name: str(r[4]), handle: r[5].toLowerCase(), bio: bio, email: em ? em[0] : '', category: guessCategory(bio + ' ' + r[4]) };
+    return { ok: true, followers: toNum(fol), following: toNum(fing), posts: toNum(posts), name: name, handle: h || String(handle || '').toLowerCase(), bio: bio, email: em ? em[0] : '', category: guessCategory(bio + ' ' + name) };
   }
   function parseIgHtml(html, handle) {
     html = String(html || '');
