@@ -116,12 +116,26 @@ select.inp,.inp{border:1.5px solid var(--line);background:#fff;border-radius:12p
 .pf.ig{background:linear-gradient(135deg,#F58529,#DD2A7B 55%,#8134AF)}
 .pf.yt{background:#FF0000}.pf.tt{background:#111}.pf.bl{background:#03C75A}.pf.et{background:#8A90A0}
 .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:800;white-space:nowrap}
-.st-발굴{background:#EEF0F4;color:#475066}
-.st-제안발송{background:#E8ECFF;color:#293BAC}
-.st-응답{background:#F1E9FF;color:#6A2FD1}
-.st-협의중{background:#FFF1DC;color:#9A5B00}
-.st-확정{background:#E3F7EC;color:#08804A}
-.st-보류{background:#F2F3F5;color:#7B8190}
+.st-대기{background:#EEF0F4;color:#475066}
+.st-제안중{background:#E8ECFF;color:#293BAC}
+.st-승인{background:#E3F7EC;color:#08804A}
+.stepbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.stepbar .ar{color:#B5BAC6;font-weight:900}
+.stepbar button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 13px;font-weight:800;font-size:14px;color:#333}
+.stepbar button.on{color:#fff}
+.stepbar button[data-s="대기"].on{background:#475066;border-color:#475066}
+.stepbar button[data-s="제안중"].on{background:var(--blue);border-color:var(--blue)}
+.stepbar button[data-s="승인"].on{background:#08804A;border-color:#08804A}
+.stepbar button[data-s="거절"].on{background:#B42318;border-color:#B42318}
+.stepbar .res{display:inline-flex;gap:0}
+.stepbar .res button:first-child{border-radius:10px 0 0 10px}
+.stepbar .res button:last-child{border-radius:0 10px 10px 0;margin-left:-1.5px}
+.dates{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.sdate{font-size:12px;color:var(--sub);margin-top:3px;font-weight:600}
+.cardimg{width:100%;max-width:420px;border-radius:10px;border:1px solid var(--line);display:block}
+.dmrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dmbtn{background:linear-gradient(135deg,#F58529,#DD2A7B 55%,#8134AF)!important;border:0!important;color:#fff!important}
+@media (max-width:860px){.dates{grid-template-columns:1fr}}
 .st-거절{background:#FDECEC;color:#B42318}
 .tag{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:2px 7px;margin-left:4px}
 .tag.fu{background:#FFF1C2;color:#7A5300}
@@ -298,14 +312,18 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 <script>
 /* ===== VERY LABEL 인플루언서 보드 공용 로직 (서버/미리보기 공용) ===== */
 var VL = (function () {
-  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast','following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt'];
-  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도','팔로잉','게시물수','참여율(%)','평균좋아요','평균댓글','최근게시일','협찬글수','계정유형','인스타카테고리','외부링크','등급','적합도','분석일시'];
+  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast','following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt','dateWait','dateProposed','dateResult'];
+  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도','팔로잉','게시물수','참여율(%)','평균좋아요','평균댓글','최근게시일','협찬글수','계정유형','인스타카테고리','외부링크','등급','적합도','분석일시','대기일','제안일','결과일(승인/거절)'];
   var MEMBERS = ['유경웅','박하운','염찬웅'];
-  var STATUSES = ['발굴','제안발송','응답','협의중','확정','보류','거절'];
+  var STATUSES = ['대기','제안중','승인','거절'];
+  var OLD_STATUS = { '발굴': '대기', '보류': '대기', '제안발송': '제안중', '응답': '제안중', '협의중': '제안중', '확정': '승인' };
+  function normStatus(s) { s = str(s); return STATUSES.indexOf(s) >= 0 ? s : (OLD_STATUS[s] || '대기'); }
+  function kstDate(iso) { var t = Date.parse(iso); if (!isFinite(t)) t = Date.now(); return new Date(t + 9 * 36e5).toISOString().slice(0, 10); }
+  function okDate(d) { d = str(d); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : ''; }
   var PLATFORMS = ['인스타그램','유튜브','틱톡','블로그','기타'];
   var CATEGORIES = ['건강/웰니스','다이어트/운동','뷰티','육아/맘','푸드/요리','일상/라이프','기타'];
   var OFFERS = ['제품 협찬','유료 광고','공동구매','장기 앰배서더'];
-  var EDITABLE = ['name','url','followers','category','contact','status','offer','hook','memo'];
+  var EDITABLE = ['name','url','followers','category','contact','status','offer','hook','memo','dateWait','dateProposed','dateResult'];
   var ANA = ['following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt'];
   var TAKEOVER_DAYS = 14;   // 등록 후 14일간 연락 없는 '발굴' 건은 다른 담당자가 가져올 수 있음
   var RESEND_HOURS = 24;    // 24시간 안에 같은 사람에게 다시 발송 표시하면 막음
@@ -410,12 +428,15 @@ var VL = (function () {
       id: uid(), platform: p.platform, handle: p.handle, key: p.key,
       name: str(obj.name), url: str(obj.url) && /^https?:/i.test(str(obj.url)) ? str(obj.url) : p.url,
       followers: toNum(obj.followers), category: cat, contact: str(obj.contact),
-      owner: owner, status: STATUSES.indexOf(str(obj.status)) >= 0 ? str(obj.status) : '발굴',
+      owner: owner, status: normStatus(obj.status),
       offer: offer || '제품 협찬', hook: str(obj.hook), memo: str(obj.memo),
       createdAt: now, createdBy: user, updatedAt: now, updatedBy: user,
       lastContactAt: '', lastContactBy: '', contactCount: 0, version: 1, bio: str(obj.bio).slice(0, 500), dupHits: 0, dupLast: '',
-      following: '', posts: '', engRate: '', avgLikes: '', avgComments: '', lastPost: '', adCount: '', acctType: '', igCategory: '', extLink: '', tier: tierOf(toNum(obj.followers)), fit: '', analyzedAt: ''
+      following: '', posts: '', engRate: '', avgLikes: '', avgComments: '', lastPost: '', adCount: '', acctType: '', igCategory: '', extLink: '', tier: tierOf(toNum(obj.followers)), fit: '', analyzedAt: '',
+      dateWait: okDate(obj.dateWait) || kstDate(now), dateProposed: okDate(obj.dateProposed), dateResult: okDate(obj.dateResult)
     };
+    if (r0.status === '제안중' && !r0.dateProposed) r0.dateProposed = kstDate(now);
+    if ((r0.status === '승인' || r0.status === '거절') && !r0.dateResult) r0.dateResult = kstDate(now);
     ANA.forEach(function (f) { if (obj[f] !== undefined && obj[f] !== null && obj[f] !== '') r0[f] = obj[f]; });
     return r0;
   }
@@ -590,7 +611,7 @@ var VL = (function () {
   }
 
   function canTakeover(r, now) {
-    if (r.status !== '발굴' || r.lastContactAt) return false;
+    if (normStatus(r.status) !== '대기' || r.lastContactAt) return false;
     var t = Date.parse(r.createdAt);
     return isFinite(t) && (Date.parse(now) - t) > TAKEOVER_DAYS * 864e5;
   }
@@ -613,11 +634,17 @@ var VL = (function () {
     }
     for (var i = 0; i < EDITABLE.length; i++) {
       var k = EDITABLE[i];
-      if (patch[k] !== undefined) nr[k] = k === 'followers' ? toNum(patch[k]) : str(patch[k]);
+      if (patch[k] !== undefined) nr[k] = k === 'followers' ? toNum(patch[k]) : (k.indexOf('date') === 0 ? okDate(patch[k]) : str(patch[k]));
     }
-    if (STATUSES.indexOf(nr.status) < 0) nr.status = r.status;
+    nr.status = normStatus(nr.status);
+    var oldSt = normStatus(r.status);
+    if (nr.status !== oldSt) {
+      if (nr.status === '제안중' && !nr.dateProposed) nr.dateProposed = kstDate(now);
+      if ((nr.status === '승인' || nr.status === '거절') && (patch.dateResult === undefined || !okDate(patch.dateResult))) nr.dateResult = okDate(patch.dateResult) || kstDate(now);
+    }
+    if (!nr.dateWait) nr.dateWait = kstDate(r.createdAt);
     nr.updatedAt = now; nr.updatedBy = user; nr.version = Number(r.version || 1) + 1;
-    var detail = r.status !== nr.status ? (r.status + ' → ' + nr.status) : '정보 수정';
+    var detail = oldSt !== nr.status ? (oldSt + ' → ' + nr.status) : '정보 수정';
     return { ok: true, row: nr, ops: [{ t: 'update', row: nr }], logs: [['수정', label(nr), detail]] };
   }
 
@@ -642,7 +669,9 @@ var VL = (function () {
       var last = Date.parse(r.lastContactAt);
       if (!force && isFinite(last) && (Date.parse(now) - last) < RESEND_HOURS * 36e5) { skipped.push({ label: label(r), reason: '24시간 안에 이미 발송' }); continue; }
       var nr = copy(r);
-      if (nr.status === '발굴' || nr.status === '보류') nr.status = '제안발송';
+      nr.status = normStatus(nr.status);
+      if (nr.status === '대기') nr.status = '제안중';
+      if (!nr.dateProposed) nr.dateProposed = kstDate(now);
       nr.lastContactAt = now; nr.lastContactBy = user;
       nr.contactCount = Number(r.contactCount || 0) + 1;
       nr.updatedAt = now; nr.updatedBy = user; nr.version = Number(r.version || 1) + 1;
@@ -662,7 +691,7 @@ var VL = (function () {
     FIELDS: FIELDS, LABELS: LABELS, MEMBERS: MEMBERS, STATUSES: STATUSES, PLATFORMS: PLATFORMS,
     CATEGORIES: CATEGORIES, OFFERS: OFFERS, TAKEOVER_DAYS: TAKEOVER_DAYS, RESEND_HOURS: RESEND_HOURS,
     parseAccount: parseAccount, findDup: findDup, toNum: toNum, detectPlatform: detectPlatform, label: label,
-    canTakeover: canTakeover, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, analyzeIg: analyzeIg, tierOf: tierOf, ANA: ANA, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, remove: remove
+    canTakeover: canTakeover, normStatus: normStatus, kstDate: kstDate, okDate: okDate, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, analyzeIg: analyzeIg, tierOf: tierOf, ANA: ANA, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, remove: remove
   };
 })();
 
@@ -686,19 +715,20 @@ var DEFAULT_SETTINGS = {
   brand: '베리라벨(VERY LABEL)은 유기농 야생빌베리를 100% NFC(비농축) 방식으로 착즙한 20ml 원샷 주스를 만드는 웰니스 브랜드입니다.',
   product: '유기농 야생빌베리 100% NFC 착즙주스 (20ml × 14병)',
   gift: '베리라벨 빌베리 NFC 착즙주스 1박스 (20ml × 14병)',
-  contacts: { '유경웅': '', '박하운': '', '염찬웅': '' },
+  contacts: { '유경웅': '010-8458-6007 · dbruddnd951@gmail.com', '박하운': '010-7437-1482 · VERYVERY.7day@gmail.com', '염찬웅': '010-8432-7284 · cha.noong1130@gmail.com' },
+  titles: { '유경웅': '팀장', '박하운': '대표', '염찬웅': '디렉터' },
   templates: [
     { id: 'dm', name: 'DM 첫 제안', body:
-'안녕하세요 {이름}님, 웰니스 브랜드 베리라벨(VERY LABEL) {담당자}입니다 :)\n{훅}\n\n저희는 유기농 야생빌베리를 100% NFC 방식으로 착즙한 20ml 원샷 주스를 만들고 있어요.\n{이름}님 콘텐츠 분위기와 정말 잘 어울릴 것 같아 {제안유형} 제안드리고 싶어 연락드렸습니다.\n\n제품을 먼저 보내드리고, 직접 드셔보신 뒤 편하게 소개해 주시면 돼요.\n관심 있으시면 답장 주세요. 자세한 제안서 바로 보내드릴게요!\n\n베리라벨 {담당자} {담당자연락처}' },
+'안녕하세요 {이름}님, 웰니스 브랜드 베리라벨(VERY LABEL) {담당자}입니다 :)\n{훅}\n\n저희는 유기농 야생빌베리를 100% NFC 방식으로 착즙한 20ml 원샷 주스를 만들고 있어요.\n{이름}님 콘텐츠 분위기와 정말 잘 어울릴 것 같아 {제안유형} 제안드리고 싶어 연락드렸습니다.\n\n제품을 먼저 보내드리고, 직접 드셔보신 뒤 편하게 소개해 주시면 돼요.\n관심 있으시면 답장 주세요. 자세한 제안서 바로 보내드릴게요!\n\n베리라벨 {담당자직함} {담당자}\n{담당자연락처}' },
     { id: 'mail', name: '이메일 제안서', body:
 '제목: [베리라벨] {이름}님께 드리는 {제안유형} 제안\n\n안녕하세요, {이름}님.\n웰니스 브랜드 베리라벨(VERY LABEL)에서 인플루언서 협업을 맡고 있는 {담당자}입니다.\n\n{훅}\n{이름}님의 콘텐츠와 베리라벨이 잘 어울린다고 생각해 {제안유형}을 제안드립니다.\n\n■ 브랜드 소개\n{브랜드소개}\n\n■ 제안 내용\n- 협업 형태: {제안유형}\n- 제공 내역: {제공내역}\n- 콘텐츠: {플랫폼} 게시물 1건 (형식과 일정은 편하신 방향으로 협의)\n- 진행 순서: 제품 발송 → 직접 체험 → 후기 콘텐츠 업로드\n\n■ 안내 사항\n- 게시물에는 \'유료광고\' 또는 \'협찬\' 표기를 꼭 부탁드립니다.\n- 식품이라 질병 예방·치료 효과처럼 보이는 표현은 피해 주세요.\n\n긍정적으로 검토해 주시면 받으실 주소와 연락처를 회신 부탁드립니다.\n궁금하신 점은 언제든 편하게 연락 주세요.\n\n감사합니다.\n베리라벨 {담당자} 드림\n{담당자연락처}\n{사이트}' },
     { id: 'fu', name: '팔로업', body:
-'안녕하세요 {이름}님, 베리라벨 {담당자}입니다.\n며칠 전 {제안유형} 제안으로 연락드렸는데 혹시 확인해 보셨을까요?\n\n부담 갖지 않으셔도 괜찮아요. 관심 있으시면 짧게라도 답장 주시면 자세히 안내드릴게요.\n좋은 하루 보내세요!\n\n베리라벨 {담당자} {담당자연락처}' },
-    { id: 'ok', name: '확정 안내', body:
-'{이름}님, 베리라벨과 함께해 주셔서 정말 감사합니다!\n제품 발송을 위해 아래 정보를 회신 부탁드려요.\n\n1) 받으실 분 성함\n2) 연락처\n3) 배송 주소\n\n발송 후 운송장 번호도 바로 공유드릴게요.\n게시물을 올리실 때는 \'유료광고\' 또는 \'협찬\' 표기를 꼭 부탁드리고, 업로드 후 링크를 보내주시면 확인하겠습니다.\n\n베리라벨 {담당자} {담당자연락처}' }
+'안녕하세요 {이름}님, 베리라벨 {담당자}입니다.\n며칠 전 {제안유형} 제안으로 연락드렸는데 혹시 확인해 보셨을까요?\n\n부담 갖지 않으셔도 괜찮아요. 관심 있으시면 짧게라도 답장 주시면 자세히 안내드릴게요.\n좋은 하루 보내세요!\n\n베리라벨 {담당자직함} {담당자}\n{담당자연락처}' },
+    { id: 'ok', name: '승인 안내', body:
+'{이름}님, 베리라벨과 함께해 주셔서 정말 감사합니다!\n제품 발송을 위해 아래 정보를 회신 부탁드려요.\n\n1) 받으실 분 성함\n2) 연락처\n3) 배송 주소\n\n발송 후 운송장 번호도 바로 공유드릴게요.\n게시물을 올리실 때는 \'유료광고\' 또는 \'협찬\' 표기를 꼭 부탁드리고, 업로드 후 링크를 보내주시면 확인하겠습니다.\n\n베리라벨 {담당자직함} {담당자}\n{담당자연락처}' }
   ]
 };
-var VARS = ['이름','아이디','플랫폼','카테고리','팔로워','담당자','담당자연락처','제안유형','제공내역','브랜드소개','제품','훅','사이트'];
+var VARS = ['이름','아이디','플랫폼','카테고리','팔로워','담당자','담당자직함','담당자연락처','제안유형','제공내역','브랜드소개','제품','훅','사이트'];
 
 var _bip = null;
 window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); _bip = e; renderInstall(); });
@@ -728,7 +758,7 @@ function renderInstall() {
   document.getElementById('instGo').onclick = installHelp;
   document.getElementById('instX').onclick = function () { localStorage.setItem('vl_inst_hide', '1'); renderInstall(); };
 }
-var S = { token: null, me: null, rows: [], settings: null, sheetUrl: '', tab: null, status: '전체', q: '', sort: 'recent', sel: {}, lastSync: 0, syncErr: false, loaded: false };
+var S = { token: null, me: null, rows: [], settings: null, sheetUrl: '', tab: null, status: '전체', q: '', sort: 'recent', period: 'all', from: '', to: '', sel: {}, lastSync: 0, syncErr: false, loaded: false };
 
 /* ---------- utils ---------- */
 function $(s, el) { return (el || document).querySelector(s); }
@@ -747,20 +777,21 @@ function fmtD(iso, withTime) {
 }
 function fmtStamp(iso) { if (!iso) return ''; var d = new Date(iso); if (isNaN(d)) return ''; return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function daysSince(iso) { var t = Date.parse(iso); return isFinite(t) ? (Date.now() - t) / 864e5 : Infinity; }
-function isFollowUp(r) { return r.status === '제안발송' && daysSince(r.lastContactAt) >= 5; }
+function isFollowUp(r) { return r.status === '제안중' && daysSince(r.lastContactAt || (r.dateProposed ? r.dateProposed + 'T00:00:00+09:00' : '')) >= 5; }
 function isToday(iso) { if (!iso) return false; var d = new Date(iso), n = new Date(); return d.toDateString() === n.toDateString(); }
 function av(name, size) { return '<span class="av" style="background:' + (MCOLOR[name] || '#888') + (size ? ';width:' + size + 'px;height:' + size + 'px' : '') + '">' + esc(!name ? '?' : name.length === 3 ? name.slice(1) : name.slice(0, 2)) + '</span>'; }
 function pfIcon(p) { var m = { '인스타그램': ['ig', 'IG'], '유튜브': ['yt', 'YT'], '틱톡': ['tt', 'TT'], '블로그': ['bl', 'N'] }[p] || ['et', '•']; return '<span class="pf ' + m[0] + '">' + m[1] + '</span>'; }
 function handleLabel(r) { return r.platform === '블로그' ? 'blog/' + r.handle : '@' + r.handle; }
 function badge(st) { return '<span class="badge st-' + esc(st) + '">' + esc(st) + '</span>'; }
 function toast(msg, bad) { var t = document.createElement('div'); if (bad) t.className = 'bad'; t.textContent = msg; $('#toast').appendChild(t); setTimeout(function () { t.remove(); }, bad ? 4200 : 2600); }
-function settings() { var s = S.settings || {}; var d = DEFAULT_SETTINGS; return { brand: s.brand || d.brand, product: s.product || d.product, gift: s.gift || d.gift, contacts: Object.assign({}, d.contacts, s.contacts || {}), templates: (s.templates && s.templates.length) ? s.templates : d.templates }; }
+function pickFilled(def, over) { var o = Object.assign({}, def); Object.keys(over || {}).forEach(function (k) { if (String(over[k] || '').trim()) o[k] = over[k]; }); return o; }
+function settings() { var s = S.settings || {}; var d = DEFAULT_SETTINGS; return { brand: s.brand || d.brand, product: s.product || d.product, gift: s.gift || d.gift, contacts: pickFilled(d.contacts, s.contacts), titles: pickFilled(d.titles, s.titles), templates: (s.templates && s.templates.length) ? s.templates : d.templates }; }
 function byId(id) { for (var i = 0; i < S.rows.length; i++) if (S.rows[i].id === id) return S.rows[i]; return null; }
 
 /* ---------- 멘트 생성 ---------- */
 function varsFor(r) {
   var st = settings();
-  return { '이름': r.name || handleLabel(r), '아이디': handleLabel(r), '플랫폼': r.platform, '카테고리': r.category || '', '팔로워': fmtF(r.followers), '담당자': r.owner, '담당자연락처': st.contacts[r.owner] || '', '제안유형': r.offer || '제품 협찬', '제공내역': st.gift, '브랜드소개': st.brand, '제품': st.product, '훅': r.hook || HOOKS[r.category] || HOOKS['기타'], '사이트': 'https://verylabel.kr' };
+  return { '이름': r.name || handleLabel(r), '아이디': handleLabel(r), '플랫폼': r.platform, '카테고리': r.category || '', '팔로워': fmtF(r.followers), '담당자': r.owner, '담당자직함': st.titles[r.owner] || '', '담당자연락처': st.contacts[r.owner] || '', '제안유형': r.offer || '제품 협찬', '제공내역': st.gift, '브랜드소개': st.brand, '제품': st.product, '훅': r.hook || HOOKS[r.category] || HOOKS['기타'], '사이트': 'https://verylabel.kr' };
 }
 function renderTpl(body, r) {
   var v = varsFor(r);
@@ -796,9 +827,9 @@ var Mock = {
   seed: function (d) {
     var now = Date.now(), iso = function (days) { return new Date(now - days * 864e5).toISOString(); };
     var list = [
-      ['sample_wellness_mom', '샘플 웰니스맘', 128000, '육아/맘', '유경웅', '제안발송', 6], ['sample_daily_fit', '샘플 데일리핏', 54000, '다이어트/운동', '유경웅', '발굴', -1],
-      ['https://www.youtube.com/@sample_kitchen', '샘플 키친', 310000, '푸드/요리', '박하운', '응답', 2], ['sample_glow_skin', '샘플 글로우', 23000, '뷰티', '박하운', '발굴', -1],
-      ['sample_morning_routine', '샘플 모닝루틴', 87000, '건강/웰니스', '염찬웅', '협의중', 1], ['https://blog.naver.com/sample_blogger', '샘플 블로거', 9800, '일상/라이프', '염찬웅', '확정', 9]
+      ['sample_wellness_mom', '샘플 웰니스맘', 128000, '육아/맘', '유경웅', '제안중', 6], ['sample_daily_fit', '샘플 데일리핏', 54000, '다이어트/운동', '유경웅', '대기', -1],
+      ['https://www.youtube.com/@sample_kitchen', '샘플 키친', 310000, '푸드/요리', '박하운', '제안중', 2], ['sample_glow_skin', '샘플 글로우', 23000, '뷰티', '박하운', '대기', -1],
+      ['sample_morning_routine', '샘플 모닝루틴', 87000, '건강/웰니스', '염찬웅', '승인', 1], ['https://blog.naver.com/sample_blogger', '샘플 블로거', 9800, '일상/라이프', '염찬웅', '거절', 9]
     ];
     list.forEach(function (x, i) {
       var r = VL.add(d.rows, { account: x[0], name: x[1], followers: x[2], category: x[3], owner: x[4] }, x[4], iso(12 - i)).row;
@@ -895,7 +926,9 @@ function renderShell() {
     '<div class="qc-hint">이미 있는 계정이면 빨간색으로 알려드려요. PC에 <b>인스타 자동분석</b>을 켜 두면 링크만으로 팔로워·카테고리·참여율·평균 좋아요·최근 게시·협찬 이력·연락처까지 채워지고, 휴대폰으로 넣은 링크도 자동으로 분석돼요.</div><div class="qr" id="qcR"></div></div></div></section>' +
     '<main class="wrap"><div class="chips" id="chips"></div>' +
     '<div class="toolbar"><div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="아이디, 이름, 연락처, 메모 검색" value="' + esc(S.q) + '"></div>' +
-    '<select class="inp" id="sort"><option value="recent">최근 등록순</option><option value="contact">연락 오래된순</option><option value="followers">팔로워 많은순</option><option value="status">진행 상태순</option></select>' +
+    '<select class="inp" id="period"><option value="all">기간 전체</option><option value="today">오늘</option><option value="7">최근 7일</option><option value="30">최근 30일</option><option value="month">이번 달</option><option value="custom">날짜 직접 선택</option></select>' +
+    '<span id="custDates" class="hidden" style="display:inline-flex;gap:6px;align-items:center"><input type="date" class="inp" id="dFrom"> ~ <input type="date" class="inp" id="dTo"></span>' +
+    '<select class="inp" id="sort"><option value="recent">최근 등록순</option><option value="sdate">단계 날짜순</option><option value="contact">연락 오래된순</option><option value="followers">팔로워 많은순</option><option value="status">진행 상태순</option></select>' +
     '<button class="btn primary hide-m" id="addBtn">+ 인플루언서 등록</button>' +
     '<button class="btn hide-m" id="impBtn">엑셀로 일괄등록</button>' +
     '<button class="btn" id="expBtn">엑셀 내보내기</button>' +
@@ -906,6 +939,10 @@ function renderShell() {
   $('#sort').value = S.sort;
   $('#q').oninput = function () { S.q = this.value; renderList(); };
   $('#sort').onchange = function () { S.sort = this.value; renderList(); };
+  $('#period').value = S.period; $('#custDates').classList.toggle('hidden', S.period !== 'custom'); $('#dFrom').value = S.from; $('#dTo').value = S.to;
+  $('#period').onchange = function () { S.period = this.value; $('#custDates').classList.toggle('hidden', S.period !== 'custom'); renderList(); };
+  $('#dFrom').onchange = function () { S.from = this.value; renderList(); };
+  $('#dTo').onchange = function () { S.to = this.value; renderList(); };
   $('#addBtn').onclick = $('#fab').onclick = function () { openAdd(); };
   $('#impBtn').onclick = openImport;
   $('#expBtn').onclick = openExport;
@@ -963,13 +1000,13 @@ function renderTabs() {
 }
 function renderHero() {
   var rows = tabRows(), who = S.tab === '전체' ? '팀 전체' : S.tab + '님';
-  var todo = rows.filter(function (r) { return r.status === '발굴'; }).length;
-  var sentToday = rows.filter(function (r) { return isToday(r.lastContactAt); }).length;
+  var todo = rows.filter(function (r) { return r.status === '대기'; }).length;
+  var sentToday = rows.filter(function (r) { return r.dateProposed === todayKST() || isToday(r.lastContactAt); }).length;
   var fu = rows.filter(isFollowUp).length;
-  var ok = rows.filter(function (r) { return r.status === '확정'; }).length;
+  var ok = rows.filter(function (r) { return r.status === '승인'; }).length;
   $('#heroT').innerHTML = esc(who) + ' 담당 <span class="serif" style="font-size:1.15em">' + rows.length + '</span>명';
   $('#heroP').textContent = S.tab === S.me ? '오늘 보낼 대상과 팔로업이 필요한 사람부터 확인하세요.' : (S.tab === '전체' ? '팀원 모두의 영입 현황을 한눈에 봅니다.' : S.tab + '님 담당 리스트예요. 수정·발송은 담당자만 할 수 있어요.');
-  var k = [['발굴', todo, '발송 대기'], ['today', sentToday, '오늘 발송'], ['fu', fu, '팔로업 필요'], ['확정', ok, '확정']];
+  var k = [['대기', todo, '대기'], ['today', sentToday, '오늘 제안'], ['fu', fu, '팔로업 필요'], ['승인', ok, '승인']];
   $('#kpis').innerHTML = k.map(function (x) { return '<button class="kpi" data-k="' + x[0] + '"><b>' + x[1] + '</b><span>' + x[2] + '</span></button>'; }).join('');
   $$('#kpis .kpi').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; S.status = k === 'today' ? '오늘발송' : k === 'fu' ? '팔로업' : k; renderChips(); renderList(); }; });
 }
@@ -979,18 +1016,28 @@ function renderChips() {
   var fu = rows.filter(isFollowUp).length;
   $('#chips').innerHTML = items.map(function (x) { return '<button class="chip' + (S.status === x[0] ? ' on' : '') + '" data-s="' + x[0] + '">' + x[0] + ' <b>' + x[1] + '</b></button>'; }).join('') +
     '<button class="chip fu' + (S.status === '팔로업' ? ' on' : '') + '" data-s="팔로업">팔로업 필요 <b>' + fu + '</b></button>' +
-    (S.status === '오늘발송' ? '<button class="chip on" data-s="오늘발송">오늘 발송</button>' : '');
+    (S.status === '오늘발송' ? '<button class="chip on" data-s="오늘발송">오늘 제안</button>' : '');
   $$('#chips .chip').forEach(function (b) { b.onclick = function () { S.status = b.dataset.s; S.sel = {}; renderChips(); renderList(); }; });
 }
 function visibleRows() {
   var rows = tabRows().slice(), st = S.status, q = S.q.trim().toLowerCase().replace(/^@/, '');
   if (st === '팔로업') rows = rows.filter(isFollowUp);
-  else if (st === '오늘발송') rows = rows.filter(function (r) { return isToday(r.lastContactAt); });
+  else if (st === '오늘발송') rows = rows.filter(function (r) { return r.dateProposed === todayKST() || isToday(r.lastContactAt); });
   else if (st !== '전체') rows = rows.filter(function (r) { return r.status === st; });
+  if (S.period !== 'all') {
+    var td = todayKST(), from = '', to = td;
+    if (S.period === 'today') from = td;
+    else if (S.period === '7') from = VL.kstDate(new Date(Date.now() - 6 * 864e5).toISOString());
+    else if (S.period === '30') from = VL.kstDate(new Date(Date.now() - 29 * 864e5).toISOString());
+    else if (S.period === 'month') from = td.slice(0, 8) + '01';
+    else if (S.period === 'custom') { from = S.from || '0000-00-00'; to = S.to || '9999-99-99'; }
+    rows = rows.filter(function (r) { var d = stageDate(r) || ''; return d && d >= from && d <= to; });
+  }
   if (q) rows = rows.filter(function (r) { return [r.handle, r.name, r.contact, r.memo, r.category, r.platform, r.owner].join(' ').toLowerCase().indexOf(q) >= 0; });
   var so = { recent: function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); },
     contact: function (a, b) { return String(a.lastContactAt || '0').localeCompare(String(b.lastContactAt || '0')); },
     followers: function (a, b) { return (Number(b.followers) || 0) - (Number(a.followers) || 0); },
+    sdate: function (a, b) { return String(stageDate(b) || '').localeCompare(String(stageDate(a) || '')); },
     status: function (a, b) { return VL.STATUSES.indexOf(a.status) - VL.STATUSES.indexOf(b.status); } }[S.sort];
   return rows.sort(so);
 }
@@ -1024,7 +1071,7 @@ function renderList() {
       return '<tr data-id="' + r.id + '" class="' + (S.sel[r.id] ? 'sel' : '') + (isRed(r) ? ' dup' : '') + '"><td><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + '></td>' +
         '<td><div class="acc">' + pfIcon(r.platform) + '<div><div class="h">' + esc(handleLabel(r)) + tags(r) + '</div><div class="nm">' + esc(r.name || '') + '</div></div></div></td>' +
         '<td><b>' + fmtF(r.followers) + '</b>' + (r.tier ? '<div class="muted">' + esc(r.tier) + '</div>' : '') + '</td><td>' + (r.engRate !== '' && r.engRate != null ? '<b>' + r.engRate + '%</b>' : (r.platform === '인스타그램' && !r.analyzedAt && EXT.ok ? '<span class="muted">분석 대기</span>' : '-')) + '</td><td>' + esc(r.category || '-') + '</td>' +
-        '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td><span data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</span></td>' +
+        '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td><span data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</span><div class="sdate">' + fmtYMD(stageDate(r)) + '</div></td>' +
         '<td><div>' + fmtD(r.lastContactAt) + '</div>' + (r.contactCount ? '<div class="muted">' + r.contactCount + '회 연락</div>' : '') + '</td>' +
         '<td><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button></td></tr>';
     }).join('') + '</tbody></table>';
@@ -1054,7 +1101,7 @@ function renderSelbar() {
   bar.innerHTML = '<b>' + sel.length + '명 선택</b>' + (others ? '<span class="note">다른 담당자 ' + others + '명은 발송·상태변경에서 제외돼요</span>' : '') +
     '<select id="selTpl">' + tpls.map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>'; }).join('') + '</select>' +
     '<button class="btn sm yellow" id="selXls">멘트 엑셀로 열기</button>' +
-    '<button class="btn sm" id="selSent"' + (mine.length ? '' : ' disabled') + '>발송완료 표시 (' + mine.length + ')</button>' +
+    '<button class="btn sm" id="selSent"' + (mine.length ? '' : ' disabled') + '>제안중으로 표시 (' + mine.length + ')</button>' +
     '<select id="selSt"' + (mine.length ? '' : ' disabled') + '><option value="">상태 변경</option>' + VL.STATUSES.map(function (s) { return '<option>' + s + '</option>'; }).join('') + '</select>' +
     '<button class="btn sm" id="selClr" style="margin-left:auto">선택 해제</button>';
   $('#selClr').onclick = function () { S.sel = {}; renderList(); };
@@ -1070,7 +1117,7 @@ function renderSelbar() {
 }
 function markSent(ids, force) {
   return call('markSent', { ids: ids, force: !!force }).then(function (d) {
-    if (d.done.length) toast(d.done.length + '명 발송완료로 표시했어요');
+    if (d.done.length) toast(d.done.length + '명을 제안중으로 바꿨어요 (제안일 ' + fmtYMD(todayKST()) + ')');
     if (d.skipped.length) {
       var recent = d.skipped.filter(function (s) { return s.reason.indexOf('24시간') >= 0; });
       openModal('일부는 표시하지 않았어요', '<div class="notice lock">중복 연락을 막기 위해 아래 ' + d.skipped.length + '명은 건너뛰었어요.</div><table class="mini"><tr><th>계정</th><th>이유</th></tr>' + d.skipped.map(function (s) { return '<tr><td>' + esc(s.label) + '</td><td>' + esc(s.reason) + '</td></tr>'; }).join('') + '</table>',
@@ -1141,7 +1188,10 @@ function anaGrid(r) {
     ['카테고리', r.category || '-'], ['등급', r.tier || VL.tierOf(r.followers) || '-'], ['계정 유형', r.acctType || '-'], ['인스타 분류', r.igCategory || '-']];
   return '<div class="ana">' + c.map(function (x) { return '<div><span>' + x[0] + '</span><b>' + esc(x[1]) + '</b></div>'; }).join('') + '</div>';
 }
-function stageChips(r, id) { return '<div class="stg" id="' + id + '">' + VL.STATUSES.map(function (s) { return '<button data-s="' + s + '"' + (s === r.status ? ' class="on"' : '') + '>' + s + '</button>'; }).join('') + '</div>'; }
+function stageChips(r, id) { var b = function (s, label) { return '<button data-s="' + s + '"' + (s === r.status ? ' class="on"' : '') + '>' + label + '</button>'; }; return '<div class="stepbar" id="' + id + '">' + b('대기', '① 대기') + '<span class="ar">›</span>' + b('제안중', '② 제안중') + '<span class="ar">›</span><span class="res">' + b('승인', '③ 승인') + b('거절', '거절') + '</span></div>'; }
+function stageDate(r) { return r.status === '제안중' ? r.dateProposed : (r.status === '승인' || r.status === '거절') ? r.dateResult : (r.dateWait || (r.createdAt || '').slice(0, 10)); }
+function todayKST() { return VL.kstDate(new Date().toISOString()); }
+function fmtYMD(d) { if (!d) return '-'; var p = d.split('-'); return Number(p[1]) + '/' + Number(p[2]); }
 function bindStageChips(r, id, after) {
   $$('#' + id + ' button').forEach(function (b) {
     b.onclick = function (e) {
@@ -1354,7 +1404,7 @@ function openDetail(id, tab) {
     var redN = (Number(r.dupHits) > 0 ? '<div class="notice bad"><b>중복 등록 시도 ' + r.dupHits + '회</b> · 최근: ' + esc(dl[0] || '') + (dl[1] ? ' (' + fmtStamp(dl[1]) + ')' : '') + '. 다른 팀원도 이 계정을 노리고 있어요.</div>' : '') +
       (_softDup[r.id] ? '<div class="notice bad"><b>중복 의심</b> · 같은 연락처 또는 같은 아이디: ' + esc(_softDup[r.id]) + '</div>' : '');
     body = redN + lock + '<div class="grid2">' +
-      '<div class="fld full"><label>진행 상태</label><div class="seg" id="dSt">' + VL.STATUSES.map(function (s) { return '<button data-s="' + s + '"' + (s === r.status ? ' class="on"' : '') + dis + '>' + s + '</button>'; }).join('') + '</div></div>' +
+      '<div class="fld full"><label>진행 단계</label>' + stageChips(r, 'dSt').replace(/<button /g, '<button' + dis + ' ') + '<div class="dates"><div class="fld"><label>① 대기일</label><input type="date" class="inp" id="dW" value="' + esc(r.dateWait || (r.createdAt || '').slice(0, 10)) + '"' + dis + '></div><div class="fld"><label>② 제안일</label><input type="date" class="inp" id="dP" value="' + esc(r.dateProposed || '') + '"' + dis + '></div><div class="fld"><label>③ 승인/거절일</label><input type="date" class="inp" id="dR" value="' + esc(r.dateResult || '') + '"' + dis + '></div></div></div>' +
       '<div class="fld"><label>아이디/링크</label><input class="inp" id="dAcc" value="' + esc(r.url || handleLabel(r)) + '"' + dis + '></div>' +
       '<div class="fld"><label>이름/닉네임</label><input class="inp" id="dName" value="' + esc(r.name) + '"' + dis + '></div>' +
       '<div class="fld"><label>팔로워</label><input class="inp" id="dF" value="' + esc(fmtFull(r.followers)) + '"' + dis + '></div>' +
@@ -1369,12 +1419,13 @@ function openDetail(id, tab) {
     var rf = r.platform === '인스타그램' ? '<button class="btn" id="dRef">인스타 다시 분석</button>' : '';
     foot = mine ? rf + '<button class="btn danger" id="dDel">삭제</button><select class="inp" id="dTo" style="padding:8px 10px">' + opts(VL.MEMBERS.filter(function (m) { return m !== S.me; }), '', '담당 넘기기') + '</select><span style="flex:1"></span><button class="btn" data-close>닫기</button><button class="btn primary" id="dSave">저장</button>' : rf + '<button class="btn primary" data-close>닫기</button>';
   } else {
-    var tpls = settings().templates, def = r.status === '제안발송' ? 'fu' : (r.status === '확정' ? 'ok' : 'dm');
+    var tpls = settings().templates, def = r.status === '제안중' ? 'fu' : (r.status === '승인' ? 'ok' : 'dm');
     if (!tpls.some(function (t) { return t.id === def; })) def = tpls[0].id;
     body = lock + '<div class="seg" id="mTpl" style="margin-bottom:12px">' + tpls.map(function (t) { return '<button data-t="' + esc(t.id) + '"' + (t.id === def ? ' class="on"' : '') + '>' + esc(t.name) + '</button>'; }).join('') + '</div>' +
       '<textarea class="msg" id="mTxt"></textarea>' +
+      (cardUrl(r.owner) ? '<div style="margin-top:14px;font-weight:800">함께 보낼 명함 · ' + esc(r.owner) + ' ' + esc(settings().titles[r.owner] || '') + '</div><img class="cardimg" style="margin-top:8px" src="' + esc(cardUrl(r.owner)) + '" alt="' + esc(r.owner) + ' 명함"><div class="dmrow"><button class="btn sm" id="cCopy">명함 이미지 복사</button><a class="btn sm" href="' + esc(cardUrl(r.owner)) + '" download="VERYLABEL_명함_' + esc(r.owner) + '.jpg" target="_blank" rel="noopener">명함 저장</a><button class="btn sm" id="cShare">명함+멘트 공유 (휴대폰)</button></div>' : '') +
       '<div class="muted" style="margin-top:8px">문구를 여기서 바로 고쳐서 복사해도 돼요. 템플릿 자체는 "멘트 설정"에서 바꿀 수 있어요.' + (r.lastContactAt ? '<br><b style="color:#7A5300">최근 연락: ' + fmtStamp(r.lastContactAt) + ' (' + esc(r.lastContactBy) + ')</b>' : '') + '</div>';
-    foot = '<button class="btn" id="mCopy">복사</button><button class="btn yellow" id="mXls">제안서 엑셀로 열기</button>' + (mine ? '<button class="btn primary" id="mSent">발송완료 표시</button>' : '');
+    foot = (r.platform === '인스타그램' && mine ? '<button class="btn dmbtn" id="mDM">인스타 DM 보내기</button>' : '') + '<button class="btn" id="mCopy">멘트 복사</button><button class="btn yellow" id="mXls">제안서 엑셀</button>' + (mine ? '<button class="btn primary" id="mSent">보냈어요 → 제안중</button>' : '');
   }
   openModal(title, body, foot, { pre: pre, tabs: tabsHtml, sub: esc(r.name || '') + (r.followers ? ' · 팔로워 ' + fmtF(r.followers) : '') + (r.category ? ' · ' + esc(r.category) : '') });
   $$('[data-mt]').forEach(function (b) { b.onclick = function () { openDetail(id, b.dataset.mt); }; });
@@ -1385,11 +1436,11 @@ function openDetail(id, tab) {
   var tk = $('#dTake'); if (tk) tk.onclick = function () { call('transfer', { id: id, to: S.me }).then(function (d) { if (!d.ok) return toast(d.error, true); toast('내 담당으로 가져왔어요'); renderAll(); openDetail(id, tab); }).catch(function (e) { toast(e.message, true); }); };
   if (tab === 'info' && mine) {
     var st = r.status;
-    $$('#dSt button').forEach(function (b) { b.onclick = function () { st = b.dataset.s; $$('#dSt button').forEach(function (x) { x.classList.toggle('on', x === b); }); }; });
+    $$('#dSt button').forEach(function (b) { b.onclick = function () { st = b.dataset.s; $$('#dSt button').forEach(function (x) { x.classList.toggle('on', x === b); }); var td = todayKST(); if (st === '제안중' && !$('#dP').value) $('#dP').value = td; if ((st === '승인' || st === '거절') && !$('#dR').value) $('#dR').value = td; }; });
     $('#dSave').onclick = function () {
       var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
       var acc = $('#dAcc').value.trim();
-      var patch = { status: st, name: $('#dName').value, followers: $('#dF').value, category: $('#dCat').value, contact: $('#dCon').value, offer: $('#dOf').value, hook: $('#dHook').value, memo: $('#dMemo').value };
+      var patch = { status: st, dateWait: $('#dW').value, dateProposed: $('#dP').value, dateResult: $('#dR').value, name: $('#dName').value, followers: $('#dF').value, category: $('#dCat').value, contact: $('#dCon').value, offer: $('#dOf').value, hook: $('#dHook').value, memo: $('#dMemo').value };
       if (acc && acc !== (r.url || handleLabel(r))) { patch.account = acc; if (/^https?:/i.test(acc)) patch.url = acc; }
       call('update', { id: id, patch: patch, version: r.version }).then(function (d) {
         if (!d.ok) { toast(d.error, true); renderAll(); if (d.conflict) openDetail(id); else { btn.disabled = false; btn.textContent = '저장'; } return; }
@@ -1412,6 +1463,9 @@ function openDetail(id, tab) {
     fill();
     $$('#mTpl button').forEach(function (b) { b.onclick = function () { cur = b.dataset.t; $$('#mTpl button').forEach(function (x) { x.classList.toggle('on', x === b); }); fill(); }; });
     $('#mCopy').onclick = function () { copyText($('#mTxt').value); };
+    var cc = $('#cCopy'); if (cc) cc.onclick = function () { copyCard(r.owner); };
+    var cs = $('#cShare'); if (cs) cs.onclick = function () { shareCard(r.owner, $('#mTxt').value); };
+    var dm = $('#mDM'); if (dm) dm.onclick = function () { sendDM(r, $('#mTxt').value); var ms2 = $('#mSent'); if (ms2) { ms2.textContent = '보냈으면 눌러주세요 → 제안중'; ms2.classList.add('dark'); } };
     $('#mXls').onclick = function () { exportProposal(r, $('#mTxt').value, settings().templates.filter(function (x) { return x.id === cur; })[0]); };
     var ms = $('#mSent'); if (ms) ms.onclick = function () { markSent([id]).then(function (d) { if (d && d.done && d.done.length) closeModal(); }); };
   }
@@ -1420,6 +1474,35 @@ function copyText(t) {
   var ok = function () { toast('복사했어요. DM/메일 창에 붙여넣으세요'); };
   var fb = function () { var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) { toast('복사가 막혀 있어요. 직접 선택해서 복사해 주세요', true); } ta.remove(); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb();
+}
+
+/* ---------- 명함 · DM ---------- */
+var CARD_FILE = { '유경웅': 'yoo', '박하운': 'park', '염찬웅': 'yeom' };
+function cardUrl(owner) { return CARD_FILE[owner] ? APP_URL + 'cards/' + CARD_FILE[owner] + '.jpg' : ''; }
+function cardBlob(owner, type) {
+  return fetch(cardUrl(owner)).then(function (r) { if (!r.ok) throw new Error('명함 이미지를 못 불러왔어요'); return r.blob(); }).then(function (b) {
+    if (type !== 'image/png') return b;
+    return new Promise(function (res, rej) { var img = new Image(); img.onload = function () { var c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0); c.toBlob(function (pb) { pb ? res(pb) : rej(new Error('변환 실패')); }, 'image/png'); }; img.onerror = function () { rej(new Error('명함 이미지 오류')); }; img.src = URL.createObjectURL(b); });
+  });
+}
+function copyCard(owner) {
+  if (!window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write) { toast('이 브라우저는 이미지 복사를 지원하지 않아요. "명함 저장"을 써 주세요', true); return Promise.resolve(); }
+  return navigator.clipboard.write([new ClipboardItem({ 'image/png': cardBlob(owner, 'image/png') })]).then(function () { toast('명함 이미지를 복사했어요. DM 창에서 Ctrl+V로 붙여넣으세요'); }).catch(function () { toast('이미지 복사가 막혀 있어요. "명함 저장" 후 첨부해 주세요', true); });
+}
+function shareCard(owner, text) {
+  return cardBlob(owner).then(function (b) {
+    var f = new File([b], 'VERYLABEL_명함_' + owner + '.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { copyText(text); return navigator.share({ files: [f], text: text }).catch(function () {}); }
+    toast('이 기기는 공유하기를 지원하지 않아요. 명함 저장 후 첨부해 주세요', true);
+  }).catch(function (e) { toast(e.message, true); });
+}
+function sendDM(r, text) {
+  if (r.platform !== '인스타그램') { copyText(text); return; }
+  copyText(text);
+  var url = 'https://ig.me/m/' + encodeURIComponent(r.handle);
+  if (EXT.ok) extCall({ t: 'dmPrepare', handle: r.handle, text: text, card: cardUrl(r.owner), owner: r.owner }, 5000);
+  window.open(url, '_blank', 'noopener');
+  toast(EXT.ok ? '인스타 DM 창을 열었어요. 멘트가 입력창에 들어가요. 명함 첨부 후 직접 전송해 주세요' : '멘트를 복사했어요. 열린 DM 창에 붙여넣고 명함을 첨부해 보내세요');
 }
 
 /* ---------- 엑셀 ---------- */
@@ -1444,7 +1527,7 @@ function saveWb(wb, name) {
   });
 }
 var XL = { blue: 'FF293BAC', head: { bold: true, color: { argb: 'FFFFFFFF' }, size: 11, name: '맑은 고딕' }, font: { name: '맑은 고딕', size: 11 } };
-var ST_FILL = { '발굴': 'FFEEF0F4', '제안발송': 'FFE8ECFF', '응답': 'FFF1E9FF', '협의중': 'FFFFF1DC', '확정': 'FFE3F7EC', '보류': 'FFF2F3F5', '거절': 'FFFDECEC' };
+var ST_FILL = { '대기': 'FFEEF0F4', '제안중': 'FFE8ECFF', '승인': 'FFE3F7EC', '거절': 'FFFDECEC' };
 function styleHead(ws, rowNo) {
   var row = ws.getRow(rowNo); row.height = 26;
   row.eachCell(function (c) { c.font = XL.head; c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: XL.blue } }; c.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }; });
@@ -1500,7 +1583,7 @@ function exportMessages(rows, tpl) {
     var wb = new X.Workbook();
     var ws = wb.addWorksheet('발송용 멘트', { views: [{ state: 'frozen', ySplit: 3 }] });
     var cols = [['No', 6], ['발송체크', 9], ['담당자', 10], ['플랫폼', 11], ['아이디', 24], ['이름', 16], ['프로필 링크 (클릭하면 열림)', 38], ['연락처', 22], ['상태', 10], ['최근 연락', 16], [tpl.name + ' 멘트', 78]];
-    titleRows(ws, tpl.name + ' 발송 리스트', fmtStamp(new Date().toISOString()) + ' · ' + rows.length + '명 · 보낸 뒤 앱에서 "발송완료 표시"를 눌러야 다른 팀원 화면에도 반영돼요', cols.length);
+    titleRows(ws, tpl.name + ' 발송 리스트', fmtStamp(new Date().toISOString()) + ' · ' + rows.length + '명 · 보낸 뒤 앱에서 "제안중으로 표시"를 눌러야 다른 팀원 화면에도 반영돼요', cols.length);
     ws.getRow(3).values = cols.map(function (c) { return c[0]; });
     cols.forEach(function (c, i) { ws.getColumn(i + 1).width = c[1]; });
     styleHead(ws, 3);
@@ -1561,12 +1644,13 @@ function exportProposal(r, editedMsg, curTpl) {
     ws.mergeCells(rn, 2, rn, 3); var mc = ws.getCell(rn, 2); mc.value = editedMsg; mc.font = XL.font; mc.alignment = { vertical: 'top', wrapText: true };
     ws.getRow(rn).height = Math.min(409, 17 * lineCount(editedMsg, 92) + 10);
     borderAll(ws, rn, rn, 3);
+    var cardP = cardUrl(r.owner) ? cardBlob(r.owner).then(function (b) { return b.arrayBuffer(); }).then(function (buf) { var id = wb.addImage({ buffer: buf, extension: 'jpeg' }); var at = rn + 2; ws.getCell(at, 2).value = '담당자 명함'; ws.getCell(at, 2).font = { name: '맑은 고딕', bold: true, size: 11 }; ws.addImage(id, { tl: { col: 1, row: at }, ext: { width: 420, height: 234 } }); for (var q = at + 1; q <= at + 12; q++) ws.getRow(q).height = 20; }).catch(function () {}) : Promise.resolve();
     var ws2 = wb.addWorksheet('멘트 모음');
     ws2.getColumn(1).width = 16; ws2.getColumn(2).width = 90;
     ws2.getRow(1).values = ['종류', '멘트']; styleHead(ws2, 1);
     st.templates.forEach(function (t) { var m = renderTpl(t.body, r); var row = ws2.addRow([t.name, m]); row.font = XL.font; row.alignment = { vertical: 'top', wrapText: true }; row.height = Math.min(409, 16 * lineCount(m, 88) + 8); });
     borderAll(ws2, 1, st.templates.length + 1, 2);
-    return saveWb(wb, 'VERYLABEL_제안서_' + handleLabel(r).replace(/[@\/\\:*?"<>|]/g, '') + '_' + stampFile() + '.xlsx');
+    return cardP.then(function () { return saveWb(wb, 'VERYLABEL_제안서_' + handleLabel(r).replace(/[@\/\\:*?"<>|]/g, '') + '_' + stampFile() + '.xlsx'); });
   }).catch(function (e) { toast(e.message, true); });
 }
 
@@ -1679,7 +1763,7 @@ function showBulk(res, dry) {
 function openSettings() {
   var st = settings(), tpls = JSON.parse(JSON.stringify(st.templates)), cur = 0;
   var body = '<div class="notice info">여기서 바꾼 내용은 팀 전체에 같이 적용돼요. 성과 보장 수치(매출, 효과)는 근거 없이 넣지 마세요.</div>' +
-    '<h4 style="margin:4px 0 8px">담당자 연락처 (멘트 끝에 들어가요)</h4><div class="grid2" style="grid-template-columns:repeat(3,1fr)">' + VL.MEMBERS.map(function (m) { return '<div class="fld"><label>' + m + '</label><input class="inp" data-ct="' + m + '" value="' + esc(st.contacts[m] || '') + '" placeholder="예: 010-0000-0000 / 메일"></div>'; }).join('') + '</div>' +
+    '<h4 style="margin:4px 0 8px">담당자 연락처 (멘트 끝에 들어가요 · 명함은 자동 첨부)</h4><div class="grid2" style="grid-template-columns:repeat(3,1fr)">' + VL.MEMBERS.map(function (m) { return '<div class="fld"><label>' + m + '</label><input class="inp" data-ct="' + m + '" value="' + esc(st.contacts[m] || '') + '" placeholder="예: 010-0000-0000 / 메일"></div>'; }).join('') + '</div>' +
     '<div class="grid2" style="margin-top:12px"><div class="fld full"><label>브랜드 소개 {브랜드소개}</label><textarea class="inp" id="sBrand" rows="2">' + esc(st.brand) + '</textarea></div>' +
     '<div class="fld"><label>제품 {제품}</label><input class="inp" id="sProd" value="' + esc(st.product) + '"></div><div class="fld"><label>제공 내역 {제공내역}</label><input class="inp" id="sGift" value="' + esc(st.gift) + '"></div></div>' +
     '<h4 style="margin:18px 0 8px">멘트 템플릿</h4><div class="seg" id="sTabs"></div>' +
