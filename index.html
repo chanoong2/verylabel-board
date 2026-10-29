@@ -230,6 +230,19 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 .bm{display:inline-block;background:var(--blue);color:#fff!important;text-decoration:none;font-weight:800;padding:12px 20px;border-radius:12px;font-size:16px;cursor:grab}
 .switch{display:flex;align-items:center;gap:10px;padding:10px 12px;font-weight:600;font-size:14.5px;cursor:pointer}
 .switch input{width:18px;height:18px;accent-color:var(--blue)}
+.stg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stg button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 11px;font-weight:800;font-size:13.5px;color:#333}
+.stg button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ana{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.ana div{background:#F6F7FA;border-radius:12px;padding:9px 10px}
+.ana span{display:block;font-size:12px;color:var(--sub);font-weight:700}
+.ana b{font-size:16px;font-weight:900}
+.pop{position:absolute;z-index:70;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.16);padding:10px;width:250px}
+.pop .t{font-size:12.5px;color:var(--sub);font-weight:700;margin-bottom:6px}
+.badge.click{cursor:pointer;box-shadow:inset 0 0 0 1.5px rgba(41,59,172,.25)}
+.extok{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#0B6B3A;background:#E9F8EF;border-radius:999px;padding:3px 9px}
+.extno{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#9A5B00;background:#FFF6DB;border-radius:999px;padding:3px 9px;cursor:pointer;border:0}
+@media (max-width:860px){.ana{grid-template-columns:repeat(2,1fr)}}
 .preview-flag{background:#111;color:var(--yellow);text-align:center;font-size:12.5px;padding:5px;font-weight:700}
 .menu{position:absolute;right:20px;top:62px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.14);padding:6px;z-index:50;min-width:210px}
 .menu button,.menu a{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:9px;font-weight:600;color:var(--ink);text-decoration:none;font-size:14.5px}
@@ -279,14 +292,15 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 <script>
 /* ===== VERY LABEL 인플루언서 보드 공용 로직 (서버/미리보기 공용) ===== */
 var VL = (function () {
-  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast'];
-  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도'];
+  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast','following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt'];
+  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도','팔로잉','게시물수','참여율(%)','평균좋아요','평균댓글','최근게시일','협찬글수','계정유형','인스타카테고리','외부링크','등급','적합도','분석일시'];
   var MEMBERS = ['유경웅','박하운','염찬웅'];
   var STATUSES = ['발굴','제안발송','응답','협의중','확정','보류','거절'];
   var PLATFORMS = ['인스타그램','유튜브','틱톡','블로그','기타'];
   var CATEGORIES = ['건강/웰니스','다이어트/운동','뷰티','육아/맘','푸드/요리','일상/라이프','기타'];
   var OFFERS = ['제품 협찬','유료 광고','공동구매','장기 앰배서더'];
   var EDITABLE = ['name','url','followers','category','contact','status','offer','hook','memo'];
+  var ANA = ['following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt'];
   var TAKEOVER_DAYS = 14;   // 등록 후 14일간 연락 없는 '발굴' 건은 다른 담당자가 가져올 수 있음
   var RESEND_HOURS = 24;    // 24시간 안에 같은 사람에게 다시 발송 표시하면 막음
 
@@ -385,15 +399,18 @@ var VL = (function () {
     var owner = MEMBERS.indexOf(str(obj.owner)) >= 0 ? str(obj.owner) : user;
     var cat = str(obj.category);
     var offer = str(obj.offer);
-    return {
+    var r0 = {
       id: uid(), platform: p.platform, handle: p.handle, key: p.key,
       name: str(obj.name), url: str(obj.url) && /^https?:/i.test(str(obj.url)) ? str(obj.url) : p.url,
       followers: toNum(obj.followers), category: cat, contact: str(obj.contact),
       owner: owner, status: STATUSES.indexOf(str(obj.status)) >= 0 ? str(obj.status) : '발굴',
       offer: offer || '제품 협찬', hook: str(obj.hook), memo: str(obj.memo),
       createdAt: now, createdBy: user, updatedAt: now, updatedBy: user,
-      lastContactAt: '', lastContactBy: '', contactCount: 0, version: 1, bio: str(obj.bio).slice(0, 500), dupHits: 0, dupLast: ''
+      lastContactAt: '', lastContactBy: '', contactCount: 0, version: 1, bio: str(obj.bio).slice(0, 500), dupHits: 0, dupLast: '',
+      following: '', posts: '', engRate: '', avgLikes: '', avgComments: '', lastPost: '', adCount: '', acctType: '', igCategory: '', extLink: '', tier: tierOf(toNum(obj.followers)), fit: '', analyzedAt: ''
     };
+    ANA.forEach(function (f) { if (obj[f] !== undefined && obj[f] !== null && obj[f] !== '') r0[f] = obj[f]; });
+    return r0;
   }
 
   function find(rows, id) { for (var i = 0; i < rows.length; i++) if (rows[i].id === id) return rows[i]; return null; }
@@ -484,9 +501,50 @@ var VL = (function () {
     var em = (bio + ' ' + text).match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
     return { ok: true, followers: fol, name: name.slice(0, 60), bio: bio, email: em ? em[0] : '', category: guessCategory(bio + ' ' + name) };
   }
+  function tierOf(n) { n = Number(n); if (!n) return ''; if (n >= 1e6) return '메가'; if (n >= 1e5) return '매크로'; if (n >= 1e4) return '마이크로'; return '나노'; }
+  var FIT_KW = /건강|웰니스|다이어트|운동|필라테스|요가|러닝|육아|아이|엄마|아침|루틴|식단|영양|유기농|비건|주스|착즙|홈카페|클린|자연|면역|피로|눈건강|베리|빌베리|과일|식품|레시피|살림/g;
+  var AD_KW = /#?(유료광고|광고|협찬|제품제공|원고료|소정의|sponsored|paidpartnership|\bad\b|공구|공동구매)/i;
+  /* 인스타 원본 데이터(확장 프로그램이 가져온 것)를 분석해 DB 항목으로 변환 */
+  function analyzeIg(raw) {
+    if (!raw) return { ok: false };
+    var now = new Date().toISOString();
+    if (raw.kind === 'meta') {
+      var m = parseIgDesc(raw.desc || '', raw.handle);
+      if (!m.ok) return { ok: false, reason: raw.notFound ? 'notfound' : 'nodata' };
+      var fitN0 = ((m.bio + ' ' + m.name).match(FIT_KW) || []).length;
+      return { ok: true, source: 'meta', followers: m.followers, following: m.following, posts: m.posts, name: m.name, bio: m.bio, email: m.email, category: m.category, tier: tierOf(m.followers), fit: fitN0 >= 3 ? '높음' : fitN0 >= 1 ? '보통' : '낮음', analyzedAt: now };
+    }
+    if (raw.kind !== 'api' || !raw.user) return { ok: false, reason: raw.notFound ? 'notfound' : (raw.limited ? 'limited' : 'nodata') };
+    var u = raw.user, items = u.items || [];
+    var fol = Number(u.followers) || 0;
+    var likes = items.map(function (x) { return Number(x.likes) || 0; }), coms = items.map(function (x) { return Number(x.comments) || 0; });
+    var sum = function (a) { return a.reduce(function (s, v) { return s + v; }, 0); };
+    var avgL = items.length ? Math.round(sum(likes) / items.length) : '', avgC = items.length ? Math.round(sum(coms) / items.length) : '';
+    var eng = (items.length && fol) ? Math.round((avgL + avgC) / fol * 10000) / 100 : '';
+    var ts = items.map(function (x) { return Number(x.ts) || 0; }).filter(function (v) { return v; }).sort(function (a, b) { return b - a; });
+    var lastPost = ts.length ? new Date(ts[0] * 1000).toISOString() : '';
+    var caps = items.map(function (x) { return str(x.caption); }).join(' \n ');
+    var ads = items.filter(function (x) { return x.paid || AD_KW.test(str(x.caption)); }).length;
+    var bio = str(u.bio), name = str(u.name);
+    var em = bio.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+    var fitN = ((bio + ' ' + name + ' ' + caps).match(FIT_KW) || []).length;
+    var type = u.isPrivate ? '비공개' : (u.isBusiness ? '비즈니스' : (u.isProfessional ? '크리에이터' : '개인'));
+    if (u.isVerified) type += '·인증';
+    return {
+      ok: true, source: 'api', followers: fol, following: Number(u.following) || '', posts: Number(u.posts) || '', name: name, bio: bio,
+      email: str(u.email) || (em ? em[0] : ''), phone: str(u.phone), category: guessCategory(str(u.category) + ' ' + bio + ' ' + name + ' ' + caps.slice(0, 1500)),
+      igCategory: str(u.category), extLink: str(u.ext), acctType: type, avgLikes: avgL, avgComments: avgC, engRate: eng, lastPost: lastPost, adCount: items.length ? ads : '',
+      tier: tierOf(fol), fit: fitN >= 6 ? '높음' : fitN >= 2 ? '보통' : '낮음', analyzedAt: now
+    };
+  }
   function cleanInfo(x) {
     if (!x || !x.ok) return { ok: false };
-    return { ok: true, followers: toNum(x.followers), name: str(x.name).slice(0, 60), bio: str(x.bio).slice(0, 500), email: str(x.email).slice(0, 80), category: CATEGORIES.indexOf(str(x.category)) >= 0 ? str(x.category) : '' };
+    var o = { ok: true, followers: toNum(x.followers), name: str(x.name).slice(0, 60), bio: str(x.bio).slice(0, 500), email: str(x.email).slice(0, 80), phone: str(x.phone).slice(0, 30), category: CATEGORIES.indexOf(str(x.category)) >= 0 ? str(x.category) : '' };
+    ['following', 'posts', 'avgLikes', 'avgComments', 'adCount'].forEach(function (f) { o[f] = toNum(x[f]); });
+    o.engRate = (x.engRate === '' || x.engRate == null || isNaN(Number(x.engRate))) ? '' : Math.round(Number(x.engRate) * 100) / 100;
+    ['lastPost', 'acctType', 'igCategory', 'extLink', 'fit', 'analyzedAt'].forEach(function (f) { o[f] = str(x[f]).slice(0, 200); });
+    o.tier = tierOf(o.followers);
+    return o;
   }
   /* 자동 수집 정보로 빈 칸 채우기 (사람이 입력한 값은 덮어쓰지 않음, 팔로워는 최신값) */
   function mergeInfo(obj, info) {
@@ -496,6 +554,8 @@ var VL = (function () {
     if (!str(obj.category) && info.category) obj.category = info.category;
     if (!str(obj.contact) && info.email) obj.contact = info.email;
     if (!str(obj.bio)) obj.bio = info.bio;
+    if (!str(obj.contact) && info.phone) obj.contact = info.phone;
+    ANA.forEach(function (f) { if (info[f] !== undefined && info[f] !== '') obj[f] = info[f]; });
     return obj;
   }
   function refresh(rows, id, info, user, now) {
@@ -507,7 +567,10 @@ var VL = (function () {
     if (!nr.name) nr.name = info.name;
     if (!nr.category && info.category) nr.category = info.category;
     if (!nr.contact && info.email) nr.contact = info.email;
-    nr.bio = info.bio;
+    if (info.bio) nr.bio = info.bio;
+    if (!nr.contact && info.phone) nr.contact = info.phone;
+    ANA.forEach(function (f) { if (info[f] !== undefined && info[f] !== '') nr[f] = info[f]; });
+    nr.tier = tierOf(Number(nr.followers));
     nr.updatedAt = now; nr.updatedBy = user; nr.version = Number(r.version || 1) + 1;
     return { ok: true, row: nr, ops: [{ t: 'update', row: nr }], logs: [['정보갱신', label(nr), '팔로워 ' + nr.followers]] };
   }
@@ -585,7 +648,7 @@ var VL = (function () {
     FIELDS: FIELDS, LABELS: LABELS, MEMBERS: MEMBERS, STATUSES: STATUSES, PLATFORMS: PLATFORMS,
     CATEGORIES: CATEGORIES, OFFERS: OFFERS, TAKEOVER_DAYS: TAKEOVER_DAYS, RESEND_HOURS: RESEND_HOURS,
     parseAccount: parseAccount, findDup: findDup, toNum: toNum, detectPlatform: detectPlatform, label: label,
-    canTakeover: canTakeover, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, remove: remove
+    canTakeover: canTakeover, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, analyzeIg: analyzeIg, tierOf: tierOf, ANA: ANA, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, remove: remove
   };
 })();
 
@@ -756,7 +819,7 @@ function renderLogin(err) {
     if (!pick) { $('#lerr').textContent = '이름을 먼저 눌러 주세요'; return; }
     var btn = $('#loginBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> 확인 중';
     call('login', { name: pick, pin: $('#pin').value.trim() }).then(function (d) {
-      S.token = d.token; S.me = d.name; localStorage.setItem('vl_token', d.token); localStorage.setItem('vl_last_member', d.name);
+      S.token = d.token; S.me = d.name; localStorage.setItem('vl_token', d.token); setTimeout(sendAuthToExt, 50); localStorage.setItem('vl_last_member', d.name);
       if (d.first) toast('PIN이 저장됐어요. 다음부터 이 PIN으로 로그인하세요');
       start();
     }).catch(function (e) { btn.disabled = false; btn.textContent = '로그인'; $('#lerr').textContent = e.message; });
@@ -766,6 +829,7 @@ function renderLogin(err) {
 }
 function logout(expired) {
   if (!expired && S.token) call('logout').catch(function () {});
+  if (EXT.ok) window.postMessage({ type: 'VL_EXT_REQ', id: 0, msg: { t: 'clearAuth' } }, '*');
   S.token = null; S.me = null; S.loaded = false; localStorage.removeItem('vl_token');
   closeModal(); renderLogin(expired ? '로그인이 만료됐어요. 다시 로그인해 주세요' : '');
 }
@@ -784,10 +848,10 @@ function renderShell() {
     '<div class="hd-r"><span class="sync" id="sync"><i></i><span>연결 중</span></span><button class="me-chip" id="meBtn">' + av(S.me) + '<span class="nm">' + esc(S.me) + '</span> ▾</button></div></div>' +
     '<nav class="tabs" id="tabs"></nav></header>' +
     '<section class="hero"><div class="hero-in"><div><h1 id="heroT"></h1><p id="heroP"></p><div class="kpis" id="kpis"></div></div>' +
-    '<div class="qc"><div class="qc-t"><span class="serif">QUICK ADD</span> 링크 붙여넣으면 바로 등록</div>' +
+    '<div class="qc"><div class="qc-t"><span class="serif">QUICK ADD</span> 링크 붙여넣으면 바로 등록 <span id="extB" style="margin-left:auto"></span></div>' +
     '<div class="qc-row"><input id="qcIn" placeholder="인스타 프로필 링크 또는 @아이디" autocomplete="off" autocapitalize="off" enterkeyhint="go"><button class="btn primary" id="qcGo">등록</button></div>' +
     '<button class="btn yellow qc-paste" id="qcPaste">복사한 링크로 바로 등록</button>' +
-    '<div class="qc-hint">이미 있는 계정이면 빨간색으로 알려드려요. PC에서 <b>인스타 연동 버튼</b>을 쓰면 팔로워·이름·소개글·이메일까지 자동으로 채워져요.</div><div class="qr" id="qcR"></div></div></div></section>' +
+    '<div class="qc-hint">이미 있는 계정이면 빨간색으로 알려드려요. PC에 <b>인스타 자동분석</b>을 켜 두면 링크만으로 팔로워·카테고리·참여율·평균 좋아요·최근 게시·협찬 이력·연락처까지 채워지고, 휴대폰으로 넣은 링크도 자동으로 분석돼요.</div><div class="qr" id="qcR"></div></div></div></section>' +
     '<main class="wrap"><div class="chips" id="chips"></div>' +
     '<div class="toolbar"><div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="아이디, 이름, 연락처, 메모 검색" value="' + esc(S.q) + '"></div>' +
     '<select class="inp" id="sort"><option value="recent">최근 등록순</option><option value="contact">연락 오래된순</option><option value="followers">팔로워 많은순</option><option value="status">진행 상태순</option></select>' +
@@ -836,7 +900,7 @@ function sync(first) {
   if (!S.token) return Promise.resolve();
   return call('list').then(function (d) {
     S.rows = d.rows; S.settings = d.settings || {}; S.sheetUrl = d.sheetUrl || ''; S.lastSync = Date.now(); S.syncErr = false; S.loaded = true;
-    renderAll();
+    renderAll(); setTimeout(enrichQueue, 1000);
   }).catch(function (e) { S.syncErr = true; renderSync(); if (first) toast(e.message, true); });
 }
 function renderSync() {
@@ -845,7 +909,7 @@ function renderSync() {
   var sec = Math.round((Date.now() - S.lastSync) / 1000);
   el.innerHTML = '<i></i><span>' + (S.syncErr ? '연결 끊김 · 재시도 중' : (sec < 10 ? '방금 동기화됨' : sec < 60 ? sec + '초 전 동기화' : Math.round(sec / 60) + '분 전 동기화')) + '</span>';
 }
-function renderAll() { renderTabs(); renderHero(); renderChips(); renderList(); renderSync(); var v = $('#qcIn'); if (v && v.value) quickCheck(v.value); }
+function renderAll() { renderExtBadge(); renderTabs(); renderHero(); renderChips(); renderList(); renderSync(); var v = $('#qcIn'); if (v && v.value) quickCheck(v.value); }
 
 function tabRows() { return S.tab === '전체' ? S.rows : S.rows.filter(function (r) { return r.owner === S.tab; }); }
 function renderTabs() {
@@ -913,25 +977,26 @@ function renderList() {
     renderSelbar(); return;
   }
   var allSel = rows.every(function (r) { return S.sel[r.id]; });
-  var html = '<table class="tbl"><thead><tr><th style="width:40px"><input type="checkbox" class="cb" id="selAll"' + (allSel ? ' checked' : '') + '></th><th>계정</th><th>팔로워</th><th>카테고리</th><th>담당자</th><th>상태</th><th>최근 연락</th><th style="width:120px"></th></tr></thead><tbody>' +
+  var html = '<table class="tbl"><thead><tr><th style="width:40px"><input type="checkbox" class="cb" id="selAll"' + (allSel ? ' checked' : '') + '></th><th>계정</th><th>팔로워</th><th>참여율</th><th>카테고리</th><th>담당자</th><th>상태</th><th>최근 연락</th><th style="width:120px"></th></tr></thead><tbody>' +
     rows.map(function (r) {
       return '<tr data-id="' + r.id + '" class="' + (S.sel[r.id] ? 'sel' : '') + (isRed(r) ? ' dup' : '') + '"><td><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + '></td>' +
         '<td><div class="acc">' + pfIcon(r.platform) + '<div><div class="h">' + esc(handleLabel(r)) + tags(r) + '</div><div class="nm">' + esc(r.name || '') + '</div></div></div></td>' +
-        '<td><b>' + fmtF(r.followers) + '</b></td><td>' + esc(r.category || '-') + '</td>' +
-        '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td>' + badge(r.status) + '</td>' +
+        '<td><b>' + fmtF(r.followers) + '</b>' + (r.tier ? '<div class="muted">' + esc(r.tier) + '</div>' : '') + '</td><td>' + (r.engRate !== '' && r.engRate != null ? '<b>' + r.engRate + '%</b>' : (r.platform === '인스타그램' && !r.analyzedAt && EXT.ok ? '<span class="muted">분석 대기</span>' : '-')) + '</td><td>' + esc(r.category || '-') + '</td>' +
+        '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td><span data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</span></td>' +
         '<td><div>' + fmtD(r.lastContactAt) + '</div>' + (r.contactCount ? '<div class="muted">' + r.contactCount + '회 연락</div>' : '') + '</td>' +
         '<td><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button></td></tr>';
     }).join('') + '</tbody></table>';
   html += '<div class="cards">' + rows.map(function (r) {
     return '<div class="card' + (S.sel[r.id] ? ' sel' : '') + (isRed(r) ? ' dup' : '') + '" data-id="' + r.id + '"><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + ' style="margin-top:6px">' +
       '<div style="min-width:0"><div class="acc">' + pfIcon(r.platform) + '<div style="min-width:0"><div class="h">' + esc(handleLabel(r)) + '</div><div class="nm">' + esc(r.name || '') + tags(r) + '</div></div></div>' +
-      '<div class="meta"><span>팔로워 <b>' + fmtF(r.followers) + '</b></span><span>' + esc(r.category || '카테고리 없음') + '</span><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span><span>연락 ' + fmtD(r.lastContactAt) + '</span></div></div>' +
-      '<div>' + badge(r.status) + '</div><div class="acts"><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button><button class="btn sm" data-open="' + r.id + '">상세</button></div></div>';
+      '<div class="meta"><span>팔로워 <b>' + fmtF(r.followers) + '</b></span>' + (r.engRate !== '' && r.engRate != null ? '<span>참여율 <b>' + r.engRate + '%</b></span>' : '') + '<span>' + esc(r.category || '카테고리 없음') + '</span><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span><span>연락 ' + fmtD(r.lastContactAt) + '</span></div></div>' +
+      '<div data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</div><div class="acts"><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button><button class="btn sm" data-open="' + r.id + '">상세</button></div></div>';
   }).join('') + '</div>';
   $('#list').innerHTML = html;
-  $$('#list tbody tr').forEach(function (tr) { tr.onclick = function (e) { if (e.target.closest('input,button')) return; openDetail(tr.dataset.id); }; });
-  $$('#list .card').forEach(function (c) { c.onclick = function (e) { if (e.target.closest('input,button')) return; openDetail(c.dataset.id); }; });
+  $$('#list tbody tr').forEach(function (tr) { tr.onclick = function (e) { if (e.target.closest('input,button,[data-stg]')) return; openDetail(tr.dataset.id); }; });
+  $$('#list .card').forEach(function (c) { c.onclick = function (e) { if (e.target.closest('input,button,[data-stg]')) return; openDetail(c.dataset.id); }; });
   $$('[data-msg]').forEach(function (b) { b.onclick = function () { openDetail(b.dataset.msg, 'msg'); }; });
+  $$('[data-stg]').forEach(function (s) { s.onclick = function (e) { e.stopPropagation(); var r = byId(s.dataset.stg); if (!r) return; if (r.owner !== S.me) { toast(r.owner + '님 담당이에요', true); return; } openStagePop(r, s); }; });
   $$('[data-open]').forEach(function (b) { b.onclick = function () { openDetail(b.dataset.open); }; });
   $$('.rowcb').forEach(function (c) { c.onchange = function () { if (c.checked) S.sel[c.dataset.id] = 1; else delete S.sel[c.dataset.id]; renderList(); }; });
   var sa = $('#selAll'); if (sa) sa.onchange = function () { rows.forEach(function (r) { if (sa.checked) S.sel[r.id] = 1; else delete S.sel[r.id]; }); renderList(); };
@@ -998,6 +1063,70 @@ function quickCheck(v) {
   }
 }
 
+/* ---------- 크롬 확장(인스타 분석) 연결 ---------- */
+var EXT = { ok: false, ver: '', seq: 0, wait: {} };
+window.addEventListener('message', function (e) {
+  if (e.source !== window || !e.data || typeof e.data !== 'object') return;
+  var d = e.data;
+  if (d.type === 'VL_EXT_HELLO') { var first = !EXT.ok; EXT.ok = true; EXT.ver = d.ver; sendAuthToExt(); if (first) { renderExtBadge(); setTimeout(enrichQueue, 1500); } }
+  if (d.type === 'VL_EXT_RES' && EXT.wait[d.id]) { var f = EXT.wait[d.id]; delete EXT.wait[d.id]; f(d.res); }
+});
+function extCall(msg, ms) {
+  return new Promise(function (res) {
+    if (!EXT.ok) return res(null);
+    var id = ++EXT.seq; EXT.wait[id] = res;
+    window.postMessage({ type: 'VL_EXT_REQ', id: id, msg: msg }, '*');
+    setTimeout(function () { if (EXT.wait[id]) { delete EXT.wait[id]; res(null); } }, ms || 20000);
+  });
+}
+function sendAuthToExt() { if (EXT.ok && S.token && S.me && API_URL) window.postMessage({ type: 'VL_EXT_REQ', id: 0, msg: { t: 'setAuth', token: S.token, me: S.me, api: API_URL, app: APP_URL } }, '*'); }
+function analyzeHandle(handle) { return extCall({ t: 'analyze', handle: handle }, 25000).then(function (raw) { return VL.analyzeIg(raw); }); }
+function renderExtBadge() { var el = $('#extB'); if (!el) return; el.innerHTML = EXT.ok ? '<span class="extok">● 인스타 자동분석 켜짐</span>' : '<button class="extno" id="extInst">자동분석 설치</button>'; var b = $('#extInst'); if (b) b.onclick = openConnect; }
+var _enq = { running: false, done: {}, count: 0 };
+function enrichQueue() {
+  if (!EXT.ok || _enq.running || !S.me || document.visibilityState !== 'visible' || _enq.count >= 40) return;
+  var r = S.rows.filter(function (x) { return x.platform === '인스타그램' && !_enq.done[x.id] && (!x.analyzedAt || ((x.engRate === '' || x.engRate == null) && x.acctType !== '비공개' && daysSince(x.analyzedAt) > 3)); })[0];
+  if (!r) return;
+  _enq.running = true; _enq.done[r.id] = 1; _enq.count++;
+  analyzeHandle(r.handle).then(function (info) {
+    if (!info.ok) return null;
+    return call('refresh', { id: r.id, account: r.url || r.handle, hintInfo: info });
+  }).then(function () { _enq.running = false; renderAll(); setTimeout(enrichQueue, 4000); }, function () { _enq.running = false; setTimeout(enrichQueue, 8000); });
+}
+function anaGrid(r) {
+  var c = [['팔로워', fmtF(r.followers)], ['참여율', r.engRate !== '' && r.engRate != null ? r.engRate + '%' : '-'], ['평균 좋아요', r.avgLikes ? fmtF(r.avgLikes) : '-'], ['평균 댓글', r.avgComments ? fmtF(r.avgComments) : '-'],
+    ['게시물', r.posts ? fmtF(r.posts) : '-'], ['최근 게시', r.lastPost ? fmtD(r.lastPost) : '-'], ['최근 협찬글', r.adCount !== '' && r.adCount != null ? r.adCount + '개' : '-'], ['베리라벨 적합도', r.fit || '-'],
+    ['카테고리', r.category || '-'], ['등급', r.tier || VL.tierOf(r.followers) || '-'], ['계정 유형', r.acctType || '-'], ['인스타 분류', r.igCategory || '-']];
+  return '<div class="ana">' + c.map(function (x) { return '<div><span>' + x[0] + '</span><b>' + esc(x[1]) + '</b></div>'; }).join('') + '</div>';
+}
+function stageChips(r, id) { return '<div class="stg" id="' + id + '">' + VL.STATUSES.map(function (s) { return '<button data-s="' + s + '"' + (s === r.status ? ' class="on"' : '') + '>' + s + '</button>'; }).join('') + '</div>'; }
+function bindStageChips(r, id, after) {
+  $$('#' + id + ' button').forEach(function (b) {
+    b.onclick = function (e) {
+      e.stopPropagation();
+      var cur = byId(r.id) || r;
+      if (cur.owner !== S.me) return toast(cur.owner + '님 담당이라 단계를 바꿀 수 없어요', true);
+      $$('#' + id + ' button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      call('update', { id: cur.id, version: cur.version, patch: { status: b.dataset.s } }).then(function (d) {
+        if (!d.ok) { toast(d.error, true); renderAll(); return; }
+        toast(handleLabel(d.row) + ' → ' + d.row.status); renderAll(); if (after) after(d.row);
+      }).catch(function (er) { toast(er.message, true); });
+    };
+  });
+}
+function openStagePop(r, anchor) {
+  closePop();
+  var p = document.createElement('div'); p.className = 'pop'; p.id = 'pop';
+  p.innerHTML = '<div class="t">' + esc(r.name || handleLabel(r)) + ' · 제안 단계</div>' + stageChips(r, 'popS');
+  document.body.appendChild(p);
+  var rc = anchor.getBoundingClientRect();
+  p.style.top = (window.scrollY + rc.bottom + 6) + 'px';
+  p.style.left = Math.max(8, Math.min(window.innerWidth - 262, window.scrollX + rc.left - 80)) + 'px';
+  bindStageChips(r, 'popS', closePop);
+  setTimeout(function () { document.addEventListener('click', function h(e) { if (!e.target.closest('#pop')) { closePop(); document.removeEventListener('click', h); } }); }, 0);
+}
+function closePop() { var p = $('#pop'); if (p) p.remove(); }
+
 /* ---------- 링크 자동 등록 ---------- */
 var APP_URL = API_URL ? location.href.split(/[?#]/)[0] : 'https://chanoong2.github.io/verylabel-board/';
 var IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -1025,7 +1154,7 @@ function dupCard(r, who) {
     '<div class="acts"><button class="btn sm" id="rcOpen">상세 보기</button></div>', 9000);
   el.querySelector('#rcOpen').onclick = function () { hideRC(); openDetail(r.id); };
 }
-function quickAdd(input, hintDesc, source, hintInfo) {
+function quickAdd(input, hintDesc, source, hintInfo, force) {
   var link = extractLink(input) || String(input || '').trim();
   var p = VL.parseAccount(link);
   if (!p) { if (source !== 'auto') toast('프로필 링크나 @아이디를 확인해 주세요. (게시물 링크 말고 프로필 링크)', true); return Promise.resolve(); }
@@ -1033,23 +1162,34 @@ function quickAdd(input, hintDesc, source, hintInfo) {
   var d0 = VL.findDup(S.rows, p, '');
   if (d0.hard && source !== 'auto-silent') { dupCard(d0.hard); }
   if (_qBusy) return Promise.resolve();
+  if (!d0.hard && !hintInfo && EXT.ok && p.platform === '인스타그램') {
+    _qBusy = true;
+    showRC('busy', '<h3><span class="spin"></span> 인스타 분석 중</h3><div class="big">@' + esc(p.handle) + '</div><div class="ln">팔로워·카테고리·참여율·연락처를 가져오고 있어요</div>');
+    return analyzeHandle(p.handle).then(function (info) { _qBusy = false; return quickAdd(link, hintDesc, source, info.ok ? info : { ok: false, tried: true }); });
+  }
   _qBusy = true;
   if (!d0.hard) showRC('busy', '<h3><span class="spin"></span> 등록하는 중</h3><div class="big">' + esc(p.platform === '블로그' ? p.handle : '@' + p.handle) + '</div><div class="ln">' + (hintInfo && hintInfo.ok ? '팔로워 ' + fmtF(hintInfo.followers) + ' · ' + esc(hintInfo.name || '') : '중복 확인 후 저장하고 있어요') + '</div>');
-  if (d0.hard && d0.hard.owner === S.me && hintInfo && hintInfo.ok) {
+  if (d0.hard && d0.hard.owner === S.me && hintInfo && hintInfo.ok && source === 'incoming') {
     return call('refresh', { id: d0.hard.id, account: d0.hard.url || d0.hard.handle, hintInfo: hintInfo }).then(function (d) { if (d.ok) { renderAll(); showRC('ok', '<h3 style="color:#15803D">내 담당 계정 · 정보 갱신</h3><div class="big">' + esc(handleLabel(d.row)) + '</div><div class="ln">팔로워 <b>' + fmtF(d.row.followers) + '</b> · ' + esc(d.row.name || '') + '</div>', 6000); } }).catch(function (e) { toast(e.message, true); });
   }
-  return call('quickAdd', { account: link, platform: p.platform, owner: S.me, hintDesc: hintDesc || '', hintInfo: hintInfo || null, url: /^https?:/i.test(link) ? link.split('?')[0] : '' }).then(function (d) {
+  return call('quickAdd', { account: link, platform: p.platform, owner: S.me, hintDesc: hintDesc || '', hintInfo: hintInfo && hintInfo.ok ? hintInfo : null, force: !!force, url: /^https?:/i.test(link) ? link.split('?')[0] : '' }).then(function (d) {
     _qBusy = false;
     var q = $('#qcIn'); if (q) { q.value = ''; quickCheck(''); }
     renderAll();
-    if (!d.ok) { if (d.dup) { var cur = byId(d.dup.id) || d.dup; dupCard(cur); } else if (d.needConfirm) { hideRC(); openAdd(link); } else { hideRC(); toast(d.error, true); } return; }
+    if (!d.ok) { if (d.dup) { var cur = byId(d.dup.id) || d.dup; dupCard(cur); } else if (d.needConfirm) {
+      var w = showRC('bad', '<h3>비슷한 인플루언서가 있어요</h3><div class="big">@' + esc(p.handle) + '</div>' + d.soft.map(function (s) { return '<div class="ln">' + esc(s.reason) + ': <b>' + esc(handleLabel(s.row)) + '</b> (' + esc(s.row.owner) + ' 담당 · ' + esc(s.row.status) + ')</div>'; }).join('') + '<div class="ln">같은 사람이 아니면 그대로 등록하세요.</div><div class="acts"><button class="btn sm" id="rcForce">다른 사람이에요, 등록</button><button class="btn sm" id="rcCancel">취소</button></div>');
+      w.querySelector('#rcForce').onclick = function () { hideRC(); quickAdd(link, hintDesc, source, hintInfo && hintInfo.ok ? hintInfo : { ok: false, tried: true }, true); };
+      w.querySelector('#rcCancel').onclick = hideRC;
+    } else { hideRC(); toast(d.error, true); } return; }
     var r = d.row, got = d.info && d.info.ok;
-    var el = showRC('ok', '<h3 style="color:#15803D">등록 완료 · ' + esc(r.owner) + ' 담당</h3><div class="big">' + esc(handleLabel(r)) + '</div>' +
-      '<div class="ln">' + esc(r.name || '이름 없음') + ' · 팔로워 <b>' + fmtF(r.followers) + '</b>' + (r.category ? ' · ' + esc(r.category) : '') + (r.contact ? ' · ' + esc(r.contact) : '') + '</div>' +
-      (!got && !r.followers ? '<div class="ln" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><input class="inp" id="rcF" placeholder="팔로워 (예: 3.2만)" inputmode="decimal" style="flex:1;min-width:120px;padding:8px 10px"><select class="inp" id="rcC" style="padding:8px 10px">' + opts(VL.CATEGORIES, '', '카테고리') + '</select><button class="btn sm dark" id="rcSave">저장</button></div>' : '') +
+    var el = showRC('ok', '<h3 style="color:#15803D">등록 완료 · ' + esc(r.owner) + ' 담당</h3><div class="big">' + esc(r.name || handleLabel(r)) + '</div><div class="ln">' + esc(handleLabel(r)) + (r.contact ? ' · ' + esc(r.contact) : '') + '</div>' +
+      (r.followers ? anaGrid(r) : '') + '<div class="ln" style="margin-top:8px;font-weight:800">제안 단계</div>' + stageChips(r, 'rcS') +
+      (!got && !r.followers ? (EXT.ok ? '<div class="ln" style="color:#9A5B00">인스타에서 정보를 못 가져왔어요(비공개·없는 계정이거나 잠시 제한). 직접 입력해 주세요.</div>' : '<div class="ln" style="color:#9A5B00">PC에 인스타 자동분석(크롬 확장)을 설치하면 자동으로 채워져요.</div>') + '<div class="ln" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap"><input class="inp" id="rcF" placeholder="팔로워 (예: 3.2만)" inputmode="decimal" style="flex:1;min-width:120px;padding:8px 10px"><select class="inp" id="rcC" style="padding:8px 10px">' + opts(VL.CATEGORIES, '', '카테고리') + '</select><button class="btn sm dark" id="rcSave">저장</button></div>' : '') +
       '<div class="acts"><button class="btn sm primary" id="rcMsg">멘트 생성</button><button class="btn sm" id="rcOpen">상세</button><button class="btn sm danger" id="rcUndo">잘못 등록 (취소)</button></div>', 12000);
     el.querySelector('#rcMsg').onclick = function () { hideRC(); openDetail(r.id, 'msg'); };
+    el.onmouseenter = function () { clearTimeout(_rcT); };
     el.querySelector('#rcOpen').onclick = function () { hideRC(); openDetail(r.id); };
+    bindStageChips(r, 'rcS', function () { clearTimeout(_rcT); _rcT = setTimeout(hideRC, 4000); });
     var rs = el.querySelector('#rcSave'); if (rs) { el.querySelector('#rcF').onfocus = function () { clearTimeout(_rcT); }; rs.onclick = function () { var cur = byId(r.id) || r; call('update', { id: r.id, version: cur.version, patch: { followers: el.querySelector('#rcF').value, category: el.querySelector('#rcC').value } }).then(function (x) { if (!x.ok) return toast(x.error, true); hideRC(); toast('저장했어요'); renderAll(); }).catch(function (e) { toast(e.message, true); }); }; }
     el.querySelector('#rcUndo').onclick = function () { call('remove', { id: r.id }).then(function () { hideRC(); toast('등록을 취소했어요'); renderAll(); }).catch(function (e) { toast(e.message, true); }); };
   }).catch(function (e) { _qBusy = false; hideRC(); toast(e.message, true); });
@@ -1092,7 +1232,8 @@ function bookmarkletCode() {
 }
 function openConnect() {
   openModal('인스타그램 연동 (가장 빠른 등록법)',
-    '<div class="notice info"><b>PC (크롬)</b> — 아래 파란 버튼을 북마크바로 끌어다 놓으세요. 인스타그램에서 인플루언서 프로필을 보다가 북마크바의 <b>VL 등록</b>을 한 번 누르면 바로 내 담당으로 등록되고, 이미 있으면 빨간색으로 알려줘요.</div>' +
+    '<div class="notice ' + (EXT.ok ? 'ok' : 'info') + '"><b>1. PC 인스타 자동분석 (크롬 확장) ' + (EXT.ok ? '· 설치됨' : '· 추천') + '</b><br>링크만 붙여넣으면 팔로워·카테고리·참여율·평균 좋아요·최근 게시·협찬 이력·연락처를 자동으로 채워요. 인스타 프로필 화면 오른쪽 아래에 영입보드 패널이 떠서 바로 등록·중복 확인·제안 단계 변경도 돼요. 휴대폰으로 넣은 링크도 PC 앱이 켜져 있으면 자동 분석돼요.<br><br><b>설치</b> ① <a href="' + APP_URL + 'vl-extension.zip" download>확장 파일 받기</a> → 압축 풀기 ② 크롬 주소창에 <b>chrome://extensions</b> ③ 오른쪽 위 <b>개발자 모드</b> 켜기 ④ <b>압축해제된 확장 프로그램을 로드</b> → 푼 폴더 선택 ⑤ 이 앱 새로고침. 인스타그램은 이 크롬에서 로그인돼 있어야 해요.</div>' +
+    '<div class="notice info"><b>2. PC 북마크 버튼 (확장 없이)</b> — 아래 파란 버튼을 북마크바로 끌어다 놓으세요. 인스타그램에서 인플루언서 프로필을 보다가 북마크바의 <b>VL 등록</b>을 한 번 누르면 바로 내 담당으로 등록되고, 이미 있으면 빨간색으로 알려줘요.</div>' +
     '<p style="text-align:center;margin:18px 0"><a class="bm" id="bmLink" href="#">VL 등록</a></p><p class="muted" style="text-align:center;margin-top:-6px">북마크바가 안 보이면 Ctrl+Shift+B</p>' +
     '<div class="notice info"><b>안드로이드</b> — 이 앱을 "앱 설치"로 설치한 뒤, 인스타그램 프로필에서 ⋯ → <b>프로필 공유</b>(또는 링크 공유) → <b>VL 영입보드</b>를 고르면 바로 등록돼요.</div>' +
     '<div class="notice info"><b>아이폰</b> — 인스타그램 프로필에서 ⋯ → <b>프로필 URL 복사</b> → 이 앱으로 돌아와서 노란 <b>복사한 링크로 바로 등록</b> 버튼을 누르세요. (붙여넣기 허용을 눌러 주세요)</div>' +
@@ -1180,9 +1321,10 @@ function openDetail(id, tab) {
       '<div class="fld"><label>제안유형</label><select class="inp" id="dOf"' + dis + '>' + opts(VL.OFFERS.indexOf(r.offer) >= 0 ? VL.OFFERS : VL.OFFERS.concat([r.offer]), r.offer) + '</select></div>' +
       '<div class="fld full"><label>개인화 한 줄</label><input class="inp" id="dHook" value="' + esc(r.hook) + '" placeholder="' + esc(HOOKS[r.category] || HOOKS['기타']) + '"' + dis + '></div>' +
       '<div class="fld full"><label>메모</label><textarea class="inp" id="dMemo" rows="3"' + dis + '>' + esc(r.memo) + '</textarea></div></div>' +
+      (r.followers || r.analyzedAt ? '<div style="margin-top:16px;font-weight:800">인스타 분석' + (r.analyzedAt ? ' <span class="muted">(' + fmtStamp(r.analyzedAt) + ')</span>' : '') + '</div>' + anaGrid(r) + (r.extLink ? '<div class="muted" style="margin-top:6px">외부 링크: <a href="' + esc(r.extLink) + '" target="_blank" rel="noopener">' + esc(r.extLink) + '</a></div>' : '') : '') +
       (r.bio ? '<div class="bio"><b>소개글</b>\n' + esc(r.bio) + '</div>' : '') +
       '<dl class="kv" style="margin-top:16px"><dt>등록</dt><dd>' + fmtStamp(r.createdAt) + ' · ' + esc(r.createdBy) + '</dd><dt>최근 연락</dt><dd>' + (r.lastContactAt ? fmtStamp(r.lastContactAt) + ' · ' + esc(r.lastContactBy) + ' (총 ' + r.contactCount + '회)' : '아직 없음') + '</dd><dt>마지막 수정</dt><dd>' + fmtStamp(r.updatedAt) + ' · ' + esc(r.updatedBy) + '</dd></dl>';
-    var rf = r.platform === '인스타그램' ? '<button class="btn" id="dRef">정보 새로고침</button>' : '';
+    var rf = r.platform === '인스타그램' ? '<button class="btn" id="dRef">인스타 다시 분석</button>' : '';
     foot = mine ? rf + '<button class="btn danger" id="dDel">삭제</button><select class="inp" id="dTo" style="padding:8px 10px">' + opts(VL.MEMBERS.filter(function (m) { return m !== S.me; }), '', '담당 넘기기') + '</select><span style="flex:1"></span><button class="btn" data-close>닫기</button><button class="btn primary" id="dSave">저장</button>' : rf + '<button class="btn primary" data-close>닫기</button>';
   } else {
     var tpls = settings().templates, def = r.status === '제안발송' ? 'fu' : (r.status === '확정' ? 'ok' : 'dm');
@@ -1195,6 +1337,7 @@ function openDetail(id, tab) {
   openModal(title, body, foot, { pre: pre, tabs: tabsHtml, sub: esc(r.name || '') + (r.followers ? ' · 팔로워 ' + fmtF(r.followers) : '') + (r.category ? ' · ' + esc(r.category) : '') });
   $$('[data-mt]').forEach(function (b) { b.onclick = function () { openDetail(id, b.dataset.mt); }; });
   var rfb = $('#dRef'); if (rfb) rfb.onclick = function () {
+    if (EXT.ok) { rfb.disabled = true; rfb.innerHTML = '<span class="spin"></span> 분석 중'; analyzeHandle(r.handle).then(function (info) { if (!info.ok) { toast('인스타에서 정보를 못 가져왔어요. 잠시 후 다시 시도해 주세요', true); rfb.disabled = false; rfb.textContent = '인스타 다시 분석'; return; } return call('refresh', { id: id, account: r.url || r.handle, hintInfo: info }).then(function (d) { if (!d.ok) { toast(d.error, true); return; } toast('최신 정보로 분석했어요 · 팔로워 ' + fmtF(d.row.followers)); renderAll(); openDetail(id, 'info'); }); }).catch(function (e) { toast(e.message, true); }); return; }
     openModal('정보 새로고침', '<div class="notice info">인스타그램이 외부 서버의 정보 조회를 막고 있어서, <b>PC에서 이 계정의 인스타 프로필을 열고 북마크바의 VL 등록 버튼</b>을 누르면 최신 팔로워·소개글로 바로 갱신돼요.</div><p style="text-align:center"><a class="btn primary" href="' + esc(r.url) + '" target="_blank" rel="noopener">인스타 프로필 열기</a></p>', '<button class="btn" id="rfConn">연동 버튼 설치법</button><button class="btn primary" data-close>확인</button>');
     $('#rfConn').onclick = openConnect; return; rfb.disabled = true; rfb.innerHTML = '<span class="spin"></span>'; call('refresh', { id: id, account: r.url || r.handle }).then(function (d) { if (!d.ok) { toast(d.error, true); rfb.disabled = false; rfb.textContent = '정보 새로고침'; return; } toast('팔로워 ' + fmtF(d.row.followers) + ' · 최신 정보로 바꿨어요'); renderAll(); openDetail(id, 'info'); }).catch(function (e) { toast(e.message, true); rfb.disabled = false; rfb.textContent = '정보 새로고침'; }); };
   var tk = $('#dTake'); if (tk) tk.onclick = function () { call('transfer', { id: id, to: S.me }).then(function (d) { if (!d.ok) return toast(d.error, true); toast('내 담당으로 가져왔어요'); renderAll(); openDetail(id, tab); }).catch(function (e) { toast(e.message, true); }); };
@@ -1277,23 +1420,23 @@ function exportDB(rows, label, tpl) {
   return loadExcel().then(function (X) {
     var wb = new X.Workbook(); wb.creator = 'VERY LABEL';
     var ws = wb.addWorksheet('인플루언서DB', { views: [{ state: 'frozen', ySplit: 3 }] });
-    var cols = [['No', 6], ['담당자', 10], ['상태', 11], ['플랫폼', 11], ['아이디', 24], ['이름/닉네임', 18], ['팔로워', 11], ['카테고리', 14], ['연락처', 24], ['제안유형', 13], ['최근 연락', 17], ['연락횟수', 9], ['등록일', 17], ['프로필 링크', 40], ['메모', 40], ['소개글', 40], ['중복시도', 9]];
-    if (tpl) cols.push([tpl.name + ' 멘트', 70]);
+    var cols = [['No', 6], ['담당자', 10], ['상태', 11], ['플랫폼', 11], ['아이디', 24], ['이름/닉네임', 18], ['팔로워', 11], ['카테고리', 14], ['연락처', 24], ['제안유형', 13], ['최근 연락', 17], ['연락횟수', 9], ['등록일', 17], ['프로필 링크', 40], ['메모', 40], ['소개글', 40], ['중복시도', 9], ['참여율(%)', 10], ['평균좋아요', 11], ['평균댓글', 10], ['게시물수', 10], ['팔로잉', 10], ['최근게시', 12], ['최근협찬글', 10], ['적합도', 9], ['등급', 9], ['계정유형', 12], ['인스타분류', 16], ['외부링크', 30]];
+    if (tpl) cols.splice(15, 0, [tpl.name + ' 멘트', 70]);
     titleRows(ws, label, '내보낸 시각 ' + fmtStamp(new Date().toISOString()) + ' · ' + rows.length + '명 · 내보낸 사람 ' + S.me, cols.length);
     ws.getRow(3).values = cols.map(function (c) { return c[0]; });
     cols.forEach(function (c, i) { ws.getColumn(i + 1).width = c[1]; });
     styleHead(ws, 3);
     rows.forEach(function (r, i) {
-      var vals = [i + 1, r.owner, r.status, r.platform, handleLabel(r), r.name, r.followers === '' ? '' : Number(r.followers), r.category, r.contact, r.offer, fmtStamp(r.lastContactAt), r.contactCount || 0, fmtStamp(r.createdAt), r.url ? { text: r.url, hyperlink: r.url } : '', r.memo, r.bio || '', Number(r.dupHits) || 0];
+      var vals = [i + 1, r.owner, r.status, r.platform, handleLabel(r), r.name, r.followers === '' ? '' : Number(r.followers), r.category, r.contact, r.offer, fmtStamp(r.lastContactAt), r.contactCount || 0, fmtStamp(r.createdAt), r.url ? { text: r.url, hyperlink: r.url } : '', r.memo, r.bio || '', Number(r.dupHits) || 0, r.engRate === '' || r.engRate == null ? '' : Number(r.engRate), r.avgLikes === '' || r.avgLikes == null ? '' : Number(r.avgLikes), r.avgComments === '' || r.avgComments == null ? '' : Number(r.avgComments), r.posts === '' || r.posts == null ? '' : Number(r.posts), r.following === '' || r.following == null ? '' : Number(r.following), r.lastPost ? fmtStamp(r.lastPost).slice(0, 10) : '', r.adCount === '' || r.adCount == null ? '' : Number(r.adCount), r.fit || '', r.tier || '', r.acctType || '', r.igCategory || '', r.extLink || ''];
       var msg = '';
-      if (tpl) { msg = renderTpl(tpl.body, r); vals.push(msg); }
+      if (tpl) { msg = renderTpl(tpl.body, r); vals.splice(15, 0, msg); }
       var row = ws.addRow(vals);
       row.font = XL.font; row.alignment = { vertical: 'top', wrapText: true };
       row.getCell(7).numFmt = '#,##0';
       row.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ST_FILL[r.status] || 'FFFFFFFF' } };
       row.getCell(3).font = { name: '맑은 고딕', bold: true, size: 11 };
       if (r.url) row.getCell(14).font = { name: '맑은 고딕', size: 10, color: { argb: 'FF293BAC' }, underline: true };
-      row.height = Math.max(20, Math.min(400, 16 * Math.max(lineCount(r.memo, 38), tpl ? lineCount(msg, 66) : 1)));
+      row.height = Math.max(20, Math.min(400, 16 * Math.max(lineCount(r.memo, 38), lineCount(r.bio, 38), tpl ? lineCount(msg, 66) : 1)));
     });
     borderAll(ws, 3, rows.length + 3, cols.length);
     ws.autoFilter = { from: { row: 3, column: 1 }, to: { row: 3, column: cols.length } };
@@ -1521,6 +1664,7 @@ function openSettings() {
 
 /* ---------- 시작 ---------- */
 (function boot() {
+  window.postMessage({ type: 'VL_PING' }, '*');
   takeIncoming();
   window.addEventListener('focus', function () { setTimeout(checkClipboard, 300); });
   window.addEventListener('hashchange', function () { takeIncoming(); runPending(); });
@@ -1528,7 +1672,7 @@ function openSettings() {
   S.token = localStorage.getItem('vl_token');
   if (S.token) {
     S.me = IS_LIVE ? null : S.token.replace('preview-', '');
-    call('list').then(function (d) { S.me = d.me; S.rows = d.rows; S.settings = d.settings || {}; S.sheetUrl = d.sheetUrl || ''; S.loaded = true; S.lastSync = Date.now(); S.tab = d.me; renderShell(); renderAll(); runPending(); setTimeout(checkClipboard, 800); })
+    call('list').then(function (d) { S.me = d.me; S.rows = d.rows; S.settings = d.settings || {}; S.sheetUrl = d.sheetUrl || ''; S.loaded = true; S.lastSync = Date.now(); S.tab = d.me; renderShell(); renderAll(); runPending(); sendAuthToExt(); setTimeout(enrichQueue, 2000); setTimeout(checkClipboard, 800); })
       .catch(function () { renderLogin(); });
   } else renderLogin();
   setInterval(function () { if (S.token && S.me && document.visibilityState === 'visible' && !$('#modal').innerHTML) sync(); else renderSync(); }, 20000);
