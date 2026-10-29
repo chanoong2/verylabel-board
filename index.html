@@ -243,6 +243,9 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 .extok{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#0B6B3A;background:#E9F8EF;border-radius:999px;padding:3px 9px}
 .extno{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;color:#9A5B00;background:#FFF6DB;border-radius:999px;padding:3px 9px;cursor:pointer;border:0}
 @media (max-width:860px){.ana{grid-template-columns:repeat(2,1fr)}}
+.inst{display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:10px 14px;font-size:14px;font-weight:700}
+.inst .btn{margin-left:auto;padding:8px 14px;font-size:14px}
+.inst .x{background:none;border:0;color:#aaa;font-size:20px;padding:0 4px}
 .preview-flag{background:#111;color:var(--yellow);text-align:center;font-size:12.5px;padding:5px;font-weight:700}
 .menu{position:absolute;right:20px;top:62px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.14);padding:6px;z-index:50;min-width:210px}
 .menu button,.menu a{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:9px;font-weight:600;color:var(--ink);text-decoration:none;font-size:14.5px}
@@ -279,7 +282,10 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
   .topbar{font-size:12.5px;padding:6px 10px}
   .kpi{padding:8px 10px}
   .kpi span{font-size:11.5px;white-space:nowrap}
-  .preview-flag{font-size:11px}
+  .inst{display:flex;align-items:center;gap:10px;background:#111;color:#fff;padding:10px 14px;font-size:14px;font-weight:700}
+.inst .btn{margin-left:auto;padding:8px 14px;font-size:14px}
+.inst .x{background:none;border:0;color:#aaa;font-size:20px;padding:0 4px}
+.preview-flag{font-size:11px}
   .me-chip{padding:4px}
 }
 </style>
@@ -687,7 +693,33 @@ var DEFAULT_SETTINGS = {
 var VARS = ['이름','아이디','플랫폼','카테고리','팔로워','담당자','담당자연락처','제안유형','제공내역','브랜드소개','제품','훅','사이트'];
 
 var _bip = null;
-window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); _bip = e; });
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); _bip = e; renderInstall(); });
+var UA = navigator.userAgent || '';
+var IN_KAKAO = /KAKAOTALK/i.test(UA), IN_APPVIEW = IN_KAKAO || /Instagram|FBAN|FBAV|NAVER\(inapp|Line\//i.test(UA);
+var IS_STANDALONE = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+/* 카카오톡 안에서 열면 크롬/사파리로 자동 전환 (앱 설치·로그인 유지가 되도록) */
+(function () {
+  if (!IN_KAKAO || !/^https:/.test(location.href)) return;
+  var url = location.href;
+  if (/Android/i.test(UA)) location.href = 'intent://' + url.replace(/^https:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+  else location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+})();
+function installHelp() {
+  var ios = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (_bip) { _bip.prompt(); _bip.userChoice.then(function () { _bip = null; renderInstall(); }); return; }
+  var body = IN_APPVIEW ? '<div class="notice lock"><b>지금은 앱 안 브라우저예요.</b> 오른쪽 위 ⋯ 메뉴에서 <b>' + (ios ? 'Safari로 열기' : 'Chrome으로 열기 / 다른 브라우저로 열기') + '</b>를 누른 뒤 다시 설치해 주세요.</div>' : '';
+  body += ios ? '<div class="notice info"><b>아이폰</b><br>① 사파리 아래쪽 <b>공유 버튼(□↑)</b> ② <b>홈 화면에 추가</b> ③ 오른쪽 위 <b>추가</b></div>'
+    : '<div class="notice info"><b>안드로이드 (크롬)</b><br>① 오른쪽 위 <b>⋮</b> ② <b>앱 설치</b> 또는 <b>홈 화면에 추가</b> ③ <b>설치</b></div><div class="notice info"><b>PC (크롬)</b><br>주소창 오른쪽의 <b>설치 아이콘(⊕)</b> → 설치</div>';
+  body += '<p class="muted">설치하면 바탕화면에 VERY LABEL 아이콘이 생기고 주소창 없이 앱처럼 열려요. 한 번 로그인하면 30일 동안 유지돼요.</p>';
+  openModal('앱으로 설치하기', body, '<button class="btn primary" data-close>확인</button>');
+}
+function renderInstall() {
+  var el = document.getElementById('instBar'); if (!el) return;
+  if (IS_STANDALONE || !API_URL || localStorage.getItem('vl_inst_hide') === '1') { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="inst"><span>' + (IN_APPVIEW ? '앱 설치는 크롬·사파리에서 돼요' : '휴대폰·PC에 앱으로 설치해서 쓰세요') + '</span><button class="btn yellow" id="instGo">' + (_bip ? '바로 설치' : '설치 방법') + '</button><button class="x" id="instX" aria-label="닫기">×</button></div>';
+  document.getElementById('instGo').onclick = installHelp;
+  document.getElementById('instX').onclick = function () { localStorage.setItem('vl_inst_hide', '1'); renderInstall(); };
+}
 var S = { token: null, me: null, rows: [], settings: null, sheetUrl: '', tab: null, status: '전체', q: '', sort: 'recent', sel: {}, lastSync: 0, syncErr: false, loaded: false };
 
 /* ---------- utils ---------- */
@@ -804,12 +836,13 @@ function renderLogin(err) {
   var pick = null;
   $('#app').innerHTML =
     (IS_LIVE ? '' : '<div class="preview-flag">미리보기 모드 · 데이터가 이 브라우저에만 저장됩니다</div>') +
-    '<div class="login"><div class="lhero"><img src="' + LOGO + '" alt="VERY LABEL" style="height:34px;filter:invert(1)"><h1>인플루언서 영입보드</h1><p>팀이 함께 쓰는 하나의 DB · 같은 계정은 한 번만 등록돼요</p></div>' +
+    '<div id="instBar"></div><div class="login"><div class="lhero"><img src="' + LOGO + '" alt="VERY LABEL" style="height:34px;filter:invert(1)"><h1>인플루언서 영입보드</h1><p>팀이 함께 쓰는 하나의 DB · 같은 계정은 한 번만 등록돼요</p></div>' +
     '<div class="lbox"><h3>누구신가요?</h3><div class="who-pick">' +
     VL.MEMBERS.map(function (m) { return '<button data-m="' + m + '">' + av(m) + m + '</button>'; }).join('') +
     '</div><input class="pin" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN 4~8자리" autocomplete="current-password">' +
     '<div class="muted" style="margin-top:8px">처음 로그인하면 입력한 숫자가 내 PIN으로 저장돼요.</div>' +
     '<button class="btn primary" id="loginBtn">로그인</button><div class="lerr" id="lerr">' + esc(err || '') + '</div></div></div>';
+  renderInstall();
   var last = localStorage.getItem('vl_last_member');
   $$('.who-pick button').forEach(function (b) {
     b.onclick = function () { $$('.who-pick button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); pick = b.dataset.m; $('#pin').focus(); };
@@ -843,7 +876,7 @@ function start() {
 function renderShell() {
   $('#app').innerHTML =
     (IS_LIVE ? '' : '<div class="preview-flag">미리보기 모드 · 데이터가 이 브라우저에만 저장됩니다 (실제 배포하면 팀 전체가 같은 DB를 씁니다)</div>') +
-    '<div class="topbar">같은 계정은 팀 전체에서 한 번만 등록돼요<span class="hide-m"> · 발송은 담당자만 할 수 있어요</span></div>' +
+    '<div id="instBar"></div><div class="topbar">같은 계정은 팀 전체에서 한 번만 등록돼요<span class="hide-m"> · 발송은 담당자만 할 수 있어요</span></div>' +
     '<header class="hd"><div class="hd-in"><img class="logo" src="' + LOGO + '" alt="VERY LABEL"><span class="hd-sub">INFLUENCER</span>' +
     '<div class="hd-r"><span class="sync" id="sync"><i></i><span>연결 중</span></span><button class="me-chip" id="meBtn">' + av(S.me) + '<span class="nm">' + esc(S.me) + '</span> ▾</button></div></div>' +
     '<nav class="tabs" id="tabs"></nav></header>' +
@@ -861,6 +894,7 @@ function renderShell() {
     '<button class="btn" id="tplBtn">멘트 설정</button><button class="btn hide-m" id="connBtn">인스타 연동</button></div>' +
     '<div class="selbar hidden" id="selbar"></div><div id="list"></div></main>' +
     '<button class="fab" id="fab" aria-label="등록">+</button>';
+  renderInstall();
   $('#sort').value = S.sort;
   $('#q').oninput = function () { S.q = this.value; renderList(); };
   $('#sort').onchange = function () { S.sort = this.value; renderList(); };
@@ -892,7 +926,7 @@ function toggleMenu(e) {
   $('#mConn').onclick = function () { m.remove(); openConnect(); };
   $('#mClip').onclick = function (e) { e.stopPropagation(); localStorage.setItem('vl_autoclip', this.checked ? '1' : '0'); toast(this.checked ? '링크를 복사하고 앱으로 돌아오면 자동 등록돼요' : '자동 등록을 껐어요'); };
   $('#mSync').onclick = function () { m.remove(); sync(); };
-  $('#mHome').onclick = function () { m.remove(); if (_bip) { _bip.prompt(); _bip = null; return; } openModal('휴대폰 홈 화면에 추가', '<div class="notice info"><b>아이폰 (사파리로 열기)</b><br>하단 공유 버튼 □↑ → "홈 화면에 추가" → 추가</div><div class="notice info"><b>안드로이드 (크롬으로 열기)</b><br>오른쪽 위 ⋮ 메뉴 → "앱 설치" 또는 "홈 화면에 추가"</div><p class="muted">설치하면 바탕화면에 VERY LABEL 아이콘이 생기고 주소창 없이 앱처럼 열려요.</p><p class="muted">한 번 로그인하면 30일 동안 로그인이 유지돼요.</p>', '<button class="btn primary" data-close>확인</button>'); };
+  $('#mHome').onclick = function () { m.remove(); installHelp(); return; openModal('휴대폰 홈 화면에 추가', '<div class="notice info"><b>아이폰 (사파리로 열기)</b><br>하단 공유 버튼 □↑ → "홈 화면에 추가" → 추가</div><div class="notice info"><b>안드로이드 (크롬으로 열기)</b><br>오른쪽 위 ⋮ 메뉴 → "앱 설치" 또는 "홈 화면에 추가"</div><p class="muted">설치하면 바탕화면에 VERY LABEL 아이콘이 생기고 주소창 없이 앱처럼 열려요.</p><p class="muted">한 번 로그인하면 30일 동안 로그인이 유지돼요.</p>', '<button class="btn primary" data-close>확인</button>'); };
   setTimeout(function () { document.addEventListener('click', function h() { var mm = $('#menu'); if (mm) mm.remove(); document.removeEventListener('click', h); }); }, 0);
 }
 

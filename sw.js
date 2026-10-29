@@ -1,5 +1,5 @@
 /* VERY LABEL 영입보드 서비스워커: 화면 파일만 캐시, 데이터는 항상 서버에서 */
-var CACHE = 'vl-board-v1793249182645';
+var CACHE = 'vl-board-v1793249519705';
 var SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', function (e) { e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); })); self.skipWaiting(); });
 self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); })); self.clients.claim(); });
