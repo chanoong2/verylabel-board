@@ -790,7 +790,9 @@ function handleLabel(r) { return r.platform === '블로그' ? 'blog/' + r.handle
 function badge(st) { return '<span class="badge st-' + esc(st) + '">' + esc(st) + '</span>'; }
 function toast(msg, bad) { var t = document.createElement('div'); if (bad) t.className = 'bad'; t.textContent = msg; $('#toast').appendChild(t); setTimeout(function () { t.remove(); }, bad ? 4200 : 2600); }
 function pickFilled(def, over) { var o = Object.assign({}, def); Object.keys(over || {}).forEach(function (k) { if (String(over[k] || '').trim()) o[k] = over[k]; }); return o; }
-function settings() { var s = S.settings || {}; var d = DEFAULT_SETTINGS; return { brand: s.brand || d.brand, product: s.product || d.product, gift: s.gift || d.gift, contacts: pickFilled(d.contacts, s.contacts), titles: pickFilled(d.titles, s.titles), templates: (s.templates && s.templates.length) ? s.templates : d.templates }; }
+function settings() { var s = S.settings || {}; var d = DEFAULT_SETTINGS; return { brand: s.brand || d.brand, product: s.product || d.product, gift: s.gift || d.gift, contacts: pickFilled(d.contacts, s.contacts), titles: pickFilled(d.titles, s.titles), templates: myTpls(s) };
+function starterTpls() { return [{ id: 'dm', name: '내 첫 멘트', body: '안녕하세요 {이름}님! 베리라벨 {담당자}입니다.\n' }]; }
+function myTpls(s) { s = s || S.settings || {}; var t = s['tpl_' + (S.me || '')]; return (t && t.length) ? t : starterTpls(); } }
 function byId(id) { for (var i = 0; i < S.rows.length; i++) if (S.rows[i].id === id) return S.rows[i]; return null; }
 
 /* ---------- 멘트 생성 ---------- */
@@ -1868,15 +1870,15 @@ function showBulk(res, dry) {
 /* ---------- 멘트 설정 ---------- */
 function openSettings() {
   var st = settings(), tpls = JSON.parse(JSON.stringify(st.templates)), cur = 0;
-  var body = '<div class="notice info">여기서 바꾼 내용은 팀 전체에 같이 적용돼요. 성과 보장 수치(매출, 효과)는 근거 없이 넣지 마세요.</div>' +
+  var body = '<div class="notice info">브랜드 소개·제품·담당자 연락처는 팀 공통이고, <b>멘트 템플릿은 ' + esc(S.me) + '님 전용</b>이에요. 다른 영업자 멘트와 섞이지 않아요. 성과 보장 수치(매출, 효과)는 근거 없이 넣지 마세요.</div>' +
     '<h4 style="margin:4px 0 8px">팀원 (영업자)</h4><div class="muted" style="margin-bottom:8px">새 영업자를 추가하면 로그인 화면과 담당자 탭에 바로 생겨요. 처음 로그인할 때 본인 PIN을 정하면 돼요.</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">' + VL.MEMBERS.map(function (m) { return '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px 4px 4px;border:1px solid #e3e5ee;border-radius:999px;font-weight:600">' + av(m, 26) + esc(m) + '</span>'; }).join('') + '<input class="inp" id="sNewMem" placeholder="새 팀원 이름" maxlength="10" style="width:150px"><button class="btn primary" id="sAddMem" type="button">+ 팀원 추가</button></div>' +
     '<h4 style="margin:4px 0 8px">담당자 연락처 (멘트 끝에 들어가요 · 명함은 자동 첨부)</h4><div class="grid2" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">' + VL.MEMBERS.map(function (m) { return '<div class="fld"><label>' + m + '</label><input class="inp" data-ct="' + m + '" value="' + esc(st.contacts[m] || '') + '" placeholder="예: 010-0000-0000 / 메일"></div>'; }).join('') + '</div>' +
     '<div class="grid2" style="margin-top:12px"><div class="fld full"><label>브랜드 소개 {브랜드소개}</label><textarea class="inp" id="sBrand" rows="2">' + esc(st.brand) + '</textarea></div>' +
     '<div class="fld"><label>제품 {제품}</label><input class="inp" id="sProd" value="' + esc(st.product) + '"></div><div class="fld"><label>제공 내역 {제공내역}</label><input class="inp" id="sGift" value="' + esc(st.gift) + '"></div></div>' +
-    '<h4 style="margin:18px 0 8px">멘트 템플릿</h4><div class="seg" id="sTabs"></div>' +
+    '<h4 style="margin:18px 0 8px">내 멘트 템플릿 (' + esc(S.me) + '님만 사용)</h4><div class="seg" id="sTabs"></div>' +
     '<div class="fld" style="margin-top:10px"><label>템플릿 이름</label><input class="inp" id="sName" style="width:100%"></div>' +
     '<div class="fld" style="margin-top:10px"><label>내용 (아래 변수를 누르면 커서 위치에 들어가요)</label><div class="tplvars">' + VARS.map(function (v) { return '<code data-v="' + v + '">{' + v + '}</code>'; }).join('') + '</div><textarea class="inp" id="sBody" rows="12" style="width:100%"></textarea></div>';
-  openModal('멘트 설정', body, '<button class="btn" id="sReset">기본값으로</button><span style="flex:1"></span><button class="btn" data-close>취소</button><button class="btn primary" id="sSave">팀 전체에 저장</button>', { wide: true });
+  openModal('멘트 설정', body, '<button class="btn danger" id="sDel">이 멘트 삭제</button><button class="btn" id="sReset">처음 상태로</button><span style="flex:1"></span><button class="btn" data-close>취소</button><button class="btn primary" id="sSave">저장</button>', { wide: true });
   var drawTabs = function () {
     $('#sTabs').innerHTML = tpls.map(function (t, i) { return '<button data-i="' + i + '"' + (i === cur ? ' class="on"' : '') + '>' + esc(t.name) + '</button>'; }).join('') + '<button data-i="new">+ 새 템플릿</button>';
     $$('#sTabs button').forEach(function (b) { b.onclick = function () { keep(); if (b.dataset.i === 'new') { tpls.push({ id: 't' + Date.now().toString(36), name: '새 템플릿', body: '안녕하세요 {이름}님, 베리라벨 {담당자}입니다.\n' }); cur = tpls.length - 1; } else cur = Number(b.dataset.i); drawTabs(); load(); }; });
@@ -1887,13 +1889,14 @@ function openSettings() {
   $('#sNewMem').onkeydown = function (e) { if (e.key === 'Enter') $('#sAddMem').click(); };
   $('#sAddMem').onclick = function () { var nm = $('#sNewMem').value.replace(/\s+/g, ' ').trim(); if (!nm) return toast('이름을 입력해 주세요', true); if (VL.MEMBERS.indexOf(nm) >= 0) return toast('이미 있는 팀원이에요', true); if (!confirm(nm + '님을 팀원으로 추가할까요? 팀 전체에 바로 적용돼요.')) return; var b = this; b.disabled = true; call('addMember', { name: nm }).then(function (d) { VL.setMembers(d.members); toast(nm + '님을 팀원으로 추가했어요'); closeModal(); renderAll(); openSettings(); }).catch(function (e) { b.disabled = false; toast(e.message, true); }); };
   $$('.tplvars code').forEach(function (c) { c.onclick = function () { var ta = $('#sBody'), s = ta.selectionStart, e = ta.selectionEnd, v = '{' + c.dataset.v + '}'; ta.value = ta.value.slice(0, s) + v + ta.value.slice(e); ta.focus(); ta.selectionStart = ta.selectionEnd = s + v.length; }; });
-  $('#sReset').onclick = function () { if (!confirm('템플릿을 기본값으로 되돌릴까요? (저장 전까지 반영 안 됨)')) return; tpls = JSON.parse(JSON.stringify(DEFAULT_SETTINGS.templates)); cur = 0; drawTabs(); load(); };
+  $('#sReset').onclick = function () { if (!confirm('내 멘트를 처음 상태로 되돌릴까요? (저장 전까지 반영 안 됨)')) return; tpls = starterTpls(); cur = 0; drawTabs(); load(); };
+  $('#sDel').onclick = function () { if (tpls.length <= 1) return toast('멘트는 최소 1개는 있어야 해요', true); if (!confirm('"' + tpls[cur].name + '" 멘트를 삭제할까요? (저장해야 반영돼요)')) return; tpls.splice(cur, 1); cur = 0; drawTabs(); load(); };
   $('#sSave').onclick = function () {
     keep();
     var contacts = {}; $$('[data-ct]').forEach(function (i) { contacts[i.dataset.ct] = i.value.trim(); });
-    var payload = { contacts: contacts, brand: $('#sBrand').value.trim(), product: $('#sProd').value.trim(), gift: $('#sGift').value.trim(), templates: tpls };
+    var payload = { contacts: contacts, brand: $('#sBrand').value.trim(), product: $('#sProd').value.trim(), gift: $('#sGift').value.trim() }; payload['tpl_' + S.me] = tpls;
     var btn = this; btn.disabled = true;
-    call('saveSettings', payload).then(function () { S.settings = Object.assign({}, S.settings, payload); toast('팀 전체에 저장했어요'); closeModal(); }).catch(function (e) { btn.disabled = false; toast(e.message, true); });
+    call('saveSettings', payload).then(function () { S.settings = Object.assign({}, S.settings, payload); toast('저장했어요 (멘트는 ' + S.me + '님 전용)'); closeModal(); }).catch(function (e) { btn.disabled = false; toast(e.message, true); });
   };
 }
 
