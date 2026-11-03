@@ -1013,26 +1013,30 @@ function renderTabs() {
   }).join('');
   $$('#tabs .tab').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; S.status = '전체'; S.sel = {}; renderAll(); }; });
 }
+function showAllApproved() {
+  S.tab = '전체'; S.status = '승인'; S.sel = {}; S.q = ''; S.period = 'all'; S.from = ''; S.to = '';
+  $('#q').value = ''; $('#period').value = 'all'; $('#custDates').classList.add('hidden'); renderAll();
+}
 function renderHero() {
   var rows = tabRows(), who = S.tab === '전체' ? '팀 전체' : S.tab + '님';
   var todo = rows.filter(function (r) { return r.status === '대기'; }).length;
   var sentToday = rows.filter(function (r) { return r.dateProposed === todayKST() || isToday(r.lastContactAt); }).length;
   var fu = rows.filter(isFollowUp).length;
-  var ok = rows.filter(function (r) { return r.status === '승인'; }).length;
+  var ok = S.rows.filter(function (r) { return r.status === '승인'; }).length;
   $('#heroT').innerHTML = esc(who) + ' 담당 <span class="serif" style="font-size:1.15em">' + rows.length + '</span>명';
   $('#heroP').textContent = S.tab === S.me ? '오늘 보낼 대상과 팔로업이 필요한 사람부터 확인하세요.' : (S.tab === '전체' ? '팀원 모두의 영입 현황을 한눈에 봅니다.' : S.tab + '님 담당 리스트예요. 수정·발송은 담당자만 할 수 있어요.');
   var k = [['대기', todo, '대기'], ['today', sentToday, '오늘 제안'], ['fu', fu, '팔로업 필요'], ['승인', ok, '승인']];
   $('#kpis').innerHTML = k.map(function (x) { return '<button class="kpi" data-k="' + x[0] + '"><b>' + x[1] + '</b><span>' + x[2] + '</span></button>'; }).join('');
-  $$('#kpis .kpi').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; S.status = k === 'today' ? '오늘발송' : k === 'fu' ? '팔로업' : k; renderChips(); renderList(); }; });
+  $$('#kpis .kpi').forEach(function (b) { b.onclick = function () { var k = b.dataset.k; if (k === '승인') return showAllApproved(); S.status = k === 'today' ? '오늘발송' : k === 'fu' ? '팔로업' : k; renderChips(); renderList(); }; });
 }
 function renderChips() {
   var rows = tabRows();
-  var items = [['전체', rows.length]].concat(VL.STATUSES.map(function (s) { return [s, rows.filter(function (r) { return r.status === s; }).length]; }));
+  var items = [['전체', rows.length]].concat(VL.STATUSES.map(function (s) { return [s, (s === '승인' ? S.rows : rows).filter(function (r) { return r.status === s; }).length]; }));
   var fu = rows.filter(isFollowUp).length;
   $('#chips').innerHTML = items.map(function (x) { return '<button class="chip' + (S.status === x[0] ? ' on' : '') + '" data-s="' + x[0] + '">' + x[0] + ' <b>' + x[1] + '</b></button>'; }).join('') +
     '<button class="chip fu' + (S.status === '팔로업' ? ' on' : '') + '" data-s="팔로업">팔로업 필요 <b>' + fu + '</b></button>' +
     (S.status === '오늘발송' ? '<button class="chip on" data-s="오늘발송">오늘 제안</button>' : '');
-  $$('#chips .chip').forEach(function (b) { b.onclick = function () { S.status = b.dataset.s; S.sel = {}; renderChips(); renderList(); }; });
+  $$('#chips .chip').forEach(function (b) { b.onclick = function () { if (b.dataset.s === '승인') return showAllApproved(); S.status = b.dataset.s; S.sel = {}; renderChips(); renderList(); }; });
 }
 function visibleRows() {
   var rows = tabRows().slice(), st = S.status, q = S.q.trim().toLowerCase().replace(/^@/, '');
