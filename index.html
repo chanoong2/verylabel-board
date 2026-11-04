@@ -399,6 +399,24 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 
 .gb-guides{margin:0 0 14px;border:1px solid #e1e5ef;border-radius:12px;background:#fff;padding:10px 12px}.gb-guides>summary{cursor:pointer;font-size:13px;font-weight:750;color:#293bac}.gb-guides[open]>summary{margin-bottom:12px}.gb-guides .gb-ideas{margin-bottom:0}.gb-field select{width:100%;font:inherit;font-size:16px;border:1.5px solid #dce1ed;border-radius:10px;padding:10px;background:#fff}
 #groupbuyView{max-width:1180px;margin:24px auto;width:100%;padding:0 24px 32px}@media(max-width:700px){#groupbuyView{padding:0 14px 30px;margin-top:18px}}
+
+/* ALL schedules: seven fixed-width columns, no hidden dates or event truncation. */
+.gb-calendar{margin:0 0 24px;background:#fff;border:1px solid #e1e5ef;border-radius:16px;padding:18px;min-width:0}
+.gb-cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.gb-cal-head h2{font-size:22px;margin:0}.gb-cal-head p{margin:4px 0 0}.gb-cal-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gb-cal-nav strong{font-size:17px;font-variant-numeric:tabular-nums}.gb-cal-nav .gb-button{padding:6px 12px}
+.gb-cal-legend{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px}.gb-cal-person{border:1px solid #e1e5ef;background:#fff;border-radius:20px;padding:7px 10px;display:flex;align-items:center;gap:6px;font-size:12px;min-height:36px;max-width:100%;overflow-wrap:anywhere}.gb-cal-person i{width:9px;height:9px;border-radius:50%;flex:none}.gb-cal-key{font-size:12px;color:#596174;line-height:1.7;margin:8px 0 14px}
+.gb-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid #e1e5ef;border-left:1px solid #e1e5ef;min-width:0}.gb-cal-week{text-align:center;font-size:12px;padding:8px 0;background:#f4f6fc;border-bottom:1px solid #e1e5ef;border-right:1px solid #e1e5ef}.gb-cal-cell{min-width:0;min-height:108px;padding:4px;border-bottom:1px solid #e1e5ef;border-right:1px solid #e1e5ef;background:#fff}.gb-cal-out{background:#f5f6f9}.gb-cal-out .gb-cal-date{color:#737b8c}.gb-cal-chosen{box-shadow:inset 0 0 0 2px #293bac;background:#f2f4ff}.gb-cal-date{border:0;background:transparent;border-radius:7px;min-height:30px;min-width:28px;padding:3px;color:#172033;font-weight:750;font-size:13px;cursor:pointer}.gb-cal-date.gb-cal-now{background:#293bac;color:#fff}.gb-cal-event{display:block;width:100%;min-width:0;border:0;border-left:3px solid var(--event-color);border-radius:3px;background:#f0f2f7;color:var(--event-color);text-align:left;padding:4px;margin:3px 0;font-size:12px;line-height:1.35;overflow-wrap:anywhere;cursor:pointer}.gb-cal-event span,.gb-cal-event small{display:block;font-size:inherit}.gb-cal-event span{font-weight:750}.gb-cal-agenda{margin-top:18px}.gb-cal-agenda h3{font-size:16px;margin:0 0 10px}.gb-agenda-event{display:flex;width:100%;flex-direction:column;align-items:flex-start;text-align:left;gap:3px;padding:10px 12px;border:1px solid #e1e5ef;border-left:4px solid var(--event-color);background:#fff;border-radius:8px;margin:7px 0;overflow-wrap:anywhere;font-size:13px;cursor:pointer}.gb-agenda-event small{color:#596174}.gb-detail-actions{display:flex;gap:8px;flex-wrap:wrap}.gb-pdf-note{font-size:12px;color:#596174;margin:0 0 12px}
+@media(max-width:600px){.gb-calendar{padding:10px;border-radius:12px}.gb-cal-head{gap:10px}.gb-cal-nav{width:100%;justify-content:space-between;gap:3px}.gb-cal-nav strong{font-size:16px}.gb-cal-nav .gb-button{padding:6px 10px}.gb-cal-cell{padding:2px;min-height:78px}.gb-cal-event{font-size:10px;padding:3px 1px;border-left-width:2px}.gb-cal-date{min-width:26px;font-size:12px}.gb-cal-week{font-size:11px}.gb-cal-key{font-size:11px}.gb-detail-heading{flex-wrap:wrap}.gb-detail-actions{width:100%}.gb-detail-actions .gb-primary{flex:1}.gb-cal-person{font-size:12px}}
+
+
+.gb-example{margin:12px 0;min-width:0;max-width:100%;border:1px solid #e1e5ef;background:#f4f6fb;border-radius:10px;overflow:hidden}.gb-example img{display:block;width:100%;height:auto;aspect-ratio:1064 / 750;object-fit:contain;background:#f0f3f8}.gb-example figcaption{font-size:11px;line-height:1.6;color:#596174;padding:8px 10px;overflow-wrap:anywhere}
+
+/* Keep calendar typography independent from the legacy button reset. */
+#groupbuyView .gb-cal-event{display:flex;align-items:center;justify-content:space-between;gap:3px;font-size:12px;line-height:1.25;min-height:24px;padding:3px 5px;margin:2px 0}
+#groupbuyView .gb-cal-event span,#groupbuyView .gb-cal-event small{display:inline;font-size:inherit}
+#groupbuyView .gb-cal-event small{font-size:11px;white-space:nowrap}
+#groupbuyView .gb-cal-person{font-size:13px}
+@media(max-width:600px){#groupbuyView .gb-cal-event{font-size:11px;min-height:23px;padding:2px 1px;gap:1px}#groupbuyView .gb-cal-event small{font-size:10px}#groupbuyView .gb-cal-event .gb-cal-phase-word{display:none}#groupbuyView .gb-cal-person{font-size:12px}.gb-cal-cell{padding:2px}}
+#groupbuyView .gb-summary-date{font-size:12px;line-height:1.5;word-break:keep-all;overflow-wrap:normal}
 </style>
 </head>
 <body>
@@ -2117,9 +2135,133 @@ function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'),
     var completed = phase.tasks.every(function (t) { return count(c, t[0]) >= t[2]; });
     return '<article class="gb-phase"><div class="gb-phase-top"><span class="gb-phase-number">' + (i + 1) + '</span><div><h3>' + esc(phase.title) + '</h3><span class="gb-sub">' + esc(phase.relative) + '</span></div></div>' +
       '<p class="gb-phase-date">' + esc(range(a, b)) + '</p><div class="gb-badges">' + badge(state.text, state.cls) + (completed ? badge('입력 목표 달성', 'blue') : '') + '</div>' +
+      '<figure class="gb-example" data-gb-example="' + i + '"><img src="' + exampleDiagram(i) + '" alt="' + esc(phase.title + ' 촬영 예시') + '" loading="lazy"><figcaption>촬영 구도 예시 · 실제 상품 사진 아님</figcaption></figure>' +
       '<p class="gb-source-tip"><b>출처 기반 가이드</b> ' + esc(phase.advice) + '</p>' +
       '<ul class="gb-tasks">' + phase.tasks.map(function (t) { return taskHTML(c, t, canEdit); }).join('') + '</ul></article>';
   }
+
+
+  var calendarMonth = '', calendarDay = '';
+  var COLORS = ['#293bac','#a63d64','#127768','#995b13','#7145a0','#286986','#9b4332'];
+  function colorFor(c) { var ids = schedules().map(function(x){return String(x.id);}).sort(); return COLORS[Math.max(0,ids.indexOf(String(c.id))) % COLORS.length]; }
+  function windows(c) { return PHASES.map(function(p,i){return {campaign:c,phase:i,title:p.title,start:shift(c[p.from],p.a),end:shift(c[p.to],p.b)};}).filter(function(e){return e.start && e.end && e.start<=e.end;}); }
+  function calendarHTML(list, now) {
+    if (!calendarMonth) calendarMonth=now.slice(0,7);
+    if (!calendarDay) calendarDay=now;
+    var first=calendarMonth+'-01', d=new Date(first+'T00:00:00Z'), offset=d.getUTCDay();
+    var next=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)).toISOString().slice(0,10);
+    var days=Number(shift(next,-1).slice(-2)), total=Math.ceil((offset+days)/7)*7;
+    var events=[]; list.forEach(function(c){events=events.concat(windows(c));});
+    var html='<section class="gb-calendar" aria-label="전체 인플루언서 월간 일정"><div class="gb-cal-head"><div><h2>전체 일정 캘린더</h2><p class="gb-sub">모든 인플루언서 · 준비부터 공구 후 관리까지</p></div><div class="gb-cal-nav"><button class="gb-button" data-gb-month="-1" aria-label="이전 달">‹</button><strong aria-live="polite">'+Number(calendarMonth.slice(0,4))+'년 '+Number(calendarMonth.slice(5))+'월</strong><button class="gb-button" data-gb-month="1" aria-label="다음 달">›</button><button class="gb-button" data-gb-today>오늘</button></div></div>';
+    html+='<div class="gb-cal-legend">'+list.map(function(c){return '<button class="gb-cal-person" data-gb-select="'+esc(c.id)+'"><i style="background:'+colorFor(c)+'"></i>'+esc(c.name||'이름 미정')+'</button>';}).join('')+'</div><p class="gb-cal-key">단계 1 관심 만들기 · 2 오픈 예고 · 3 오픈 전날 · 4 공구 진행 · 5 마감 전 점검 · 6 공구 후 관리<br>각 날짜에 해당하는 전체 기간을 표시해요. 이름·단계를 누르면 공구 상세가 바뀌어요.</p>';
+    html+='<div class="gb-cal-grid">'+['일','월','화','수','목','금','토'].map(function(x){return '<div class="gb-cal-week">'+x+'</div>';}).join('');
+    for(var i=0;i<total;i++) {
+      var date=shift(first,i-offset), inside=date.slice(0,7)===calendarMonth, dayEvents=events.filter(function(e){return e.start<=date&&e.end>=date;});
+      html+='<div class="gb-cal-cell'+(!inside?' gb-cal-out':'')+(date===calendarDay?' gb-cal-chosen':'')+'"><button class="gb-cal-date'+(date===now?' gb-cal-now':'')+'" data-gb-day="'+date+'" aria-label="'+date+' 일정 '+dayEvents.length+'건" aria-pressed="'+(date===calendarDay)+'">'+Number(date.slice(-2))+'</button>';
+      html+=dayEvents.map(function(e){return '<button class="gb-cal-event" style="--event-color:'+colorFor(e.campaign)+'" data-gb-event="'+esc(e.campaign.id)+'" data-gb-date="'+date+'" aria-label="'+esc(date+' '+e.campaign.name+' '+e.title)+'"><span>'+esc(e.campaign.name||'이름 미정')+'</span><small>'+ (e.phase+1)+'<span class="gb-cal-phase-word">단계</span></small></button>';}).join('')+'</div>';
+    }
+    html+='</div><div class="gb-cal-agenda" aria-live="polite"><h3>'+esc(calendarDay)+' 전체 일정</h3>';
+    var agenda=events.filter(function(e){return e.start<=calendarDay && e.end>=calendarDay;});
+    html+=agenda.length?agenda.map(function(e){return '<button class="gb-agenda-event" style="--event-color:'+colorFor(e.campaign)+'" data-gb-select="'+esc(e.campaign.id)+'"><strong>'+esc(e.campaign.name||'이름 미정')+' · '+(e.phase+1)+'. '+esc(e.title)+'</strong><span>'+esc(product(e.campaign))+'</span><small>'+esc(range(e.start,e.end))+'</small></button>';}).join(''):'<p class="gb-sub">등록된 단계 일정이 없는 날이에요.</p>';
+    return html+'</div></section>';
+  }
+
+  // External-facing model deliberately excludes manager, memo and recorded progress.
+  function guidelineModel(c) {
+    return {name:String(c.name||'이름 미정'),product:product(c),start:c.start,end:c.end,source:SOURCE,
+      phases:PHASES.map(function(p,i){return {number:i+1,title:p.title,relative:p.relative,dates:range(shift(c[p.from],p.a),shift(c[p.to],p.b)),advice:p.advice,
+        tasks:p.tasks.map(function(t){return t[1]+' '+t[2]+'회 · '+(t[3]?'제안 배치: 원문 횟수 미명시':'출처 기준 목표');})};}),ideas:ideas(c)};
+  }
+  function jpegPDF(images) {
+    var enc=new TextEncoder(), chunks=[], offsets=[0], bytes=0;
+    function push(v){var a=typeof v==='string'?enc.encode(v):v;chunks.push(a);bytes+=a.length;}
+    function obj(n,s){offsets[n]=bytes;push(n+' 0 obj\n'+s+'\nendobj\n');}
+    push('%PDF-1.4\n%VL raster document\n');
+    obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+    obj(2,'<< /Type /Pages /Count '+images.length+' /Kids ['+images.map(function(_,i){return (3+i*3)+' 0 R';}).join(' ')+'] >>');
+    images.forEach(function(im,i){var n=3+i*3, stream='q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ\n';
+      obj(n,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 '+(n+2)+' 0 R >> >> /Contents '+(n+1)+' 0 R >>');
+      obj(n+1,'<< /Length '+enc.encode(stream).length+' >>\nstream\n'+stream+'endstream');
+      offsets[n+2]=bytes;push((n+2)+' 0 obj\n<< /Type /XObject /Subtype /Image /Width 1240 /Height 1754 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+im.length+' >>\nstream\n');push(im);push('\nendstream\nendobj\n');
+    });
+    var xref=bytes, size=3+images.length*3;
+    push('xref\n0 '+size+'\n0000000000 65535 f \n');
+    for(var i=1;i<size;i++)push(String(offsets[i]).padStart(10,'0')+' 00000 n \n');
+    push('trailer\n<< /Size '+size+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF');
+    return new Blob(chunks,{type:'application/pdf'});
+  }
+
+
+  var pdfConfig={phaseImages:[],imageProvider:null,productImage:null};
+  var SHOTS=[['일상 속 첫 노출','제품 디테일','질문 받기'],['사용 장면','확인된 정보','오픈 날짜'],['구매 전 정보','사용 방법','오픈 안내'],['실제 사용','질문 답변','허락받은 후기'],['마감 날짜','실제 후기','최종 안내'],['활용 방법','일상 재사용','구매 후 안내']];
+  var DIRECTIONS=['제품을 일상에 자연스럽게 배치하고 궁금한 점을 질문으로 받아 주세요.','확인된 특징과 사용 장면을 보여주고 확정된 오픈 일정만 안내해 주세요.','사용 방법과 구매 전 확인사항을 한눈에 보여 주세요. 혜택은 확정 후 표시해요.','실제 사용 경험을 짧게 설명하고 받은 질문에 답해 주세요.','정확한 종료일을 안내하고 허락받은 실제 후기만 활용해 주세요.','활용법을 안내하고 공구 종료 후에도 실제 사용하는 일상을 보여 주세요.'];
+  function isBilberry(c){return /빌베리|bilberry/i.test(product(c));}
+  function exampleDiagram(index){
+    var labels=SHOTS[index];return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1064" height="750" viewBox="0 0 1064 750"><rect width="1064" height="750" fill="#f0f3f8"/>'+labels.map(function(label,j){var x=44+j*335;return '<rect x="'+x+'" y="100" width="306" height="510" rx="20" fill="white" stroke="#d7deed"/><rect x="'+(x+35)+'" y="145" width="236" height="270" rx="12" fill="#e5eaf4"/><circle cx="'+(x+153)+'" cy="225" r="39" fill="#b9c6e1"/><rect x="'+(x+91)+'" y="278" width="124" height="90" rx="12" fill="#b9c6e1"/><text x="'+(x+153)+'" y="477" text-anchor="middle" fill="#293bac" font-family="sans-serif" font-size="24">'+label+'</text><text x="'+(x+153)+'" y="535" text-anchor="middle" fill="#657084" font-family="sans-serif" font-size="20">컷 '+(j+1)+'</text>';}).join('')+'<text x="532" y="685" text-anchor="middle" fill="#657084" font-family="sans-serif" font-size="23">촬영 구도 예시 · 실제 상품 사진 아님</text></svg>');
+  }
+  async function exampleAsset(c,index){
+    if(unknownProduct(c.product))return {image:exampleDiagram(index),caption:'상품 미정 · 촬영 구도 예시 · 실제 상품 사진 아님',diagram:true};
+    try{var input=pdfConfig.imageProvider?await pdfConfig.imageProvider(c,index):pdfConfig.phaseImages[index];if(!input)return {image:exampleDiagram(index),caption:'촬영 구도 예시 · 실제 상품 사진 아님',diagram:true};
+      var image=typeof input==='string'?input:input.image,caption=typeof input==='object'&&input.caption?String(input.caption):'촬영 참고 이미지';
+      if(!image)return {image:exampleDiagram(index),caption:'촬영 구도 예시 · 실제 상품 사진 아님',diagram:true};
+      if(isBilberry(c))caption='실제 베리라벨 병을 참고한 AI 촬영 예시 · 실제 후기 아님'+(caption==='촬영 참고 이미지'?'':' · '+caption);
+      return {image:String(image),caption:caption,diagram:false};
+    }catch(e){return {image:exampleDiagram(index),caption:'촬영 구도 예시 · 실제 상품 사진 아님',diagram:true};}
+  }
+  function loadPDFImage(input){if(!input)return Promise.resolve(null);return new Promise(function(resolve){var img=new Image(),timer=setTimeout(function(){resolve(null);},8000);img.crossOrigin='anonymous';img.onload=function(){clearTimeout(timer);resolve(img);};img.onerror=function(){clearTimeout(timer);resolve(null);};img.src=String(input);});}
+  async function hydrateExamples(c,root){
+    await Promise.all(PHASES.map(async function(_,i){var frame=root.querySelector('[data-gb-example="'+i+'"]');if(!frame)return;var asset=await exampleAsset(c,i);if(!frame.isConnected)return;var img=frame.querySelector('img'),caption=frame.querySelector('figcaption');img.onerror=function(){img.onerror=null;img.src=exampleDiagram(i);caption.textContent='촬영 구도 예시 · 이미지를 불러오지 못했어요.';};img.src=asset.image;caption.textContent=asset.caption;}));
+  }
+  function guidelinePages(c){var model=guidelineModel(c);return model.phases.map(function(p,i){return {page:i+1,name:model.name,product:model.product,campaignDates:range(model.start,model.end),phase:p,instruction:DIRECTIONS[i],idea:model.ideas[Math.floor(i/2)],source:model.source};});}
+  async function buildGuidelinePDF(c) {
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    var model=guidelinePages(c),assets=await Promise.all(PHASES.map(function(_,i){return exampleAsset(c,i);}));
+    var photos=await Promise.all(assets.map(function(a){return a.diagram?Promise.resolve(null):loadPDFImage(a.image);}));
+    var packshot=isBilberry(c)?await loadPDFImage(pdfConfig.productImage):null;
+    var font='"Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',jpegPages=[];
+    function wrap(ctx,value,size,bold,width){ctx.font=(bold?'bold ':'')+size+'px '+font;var lines=[];String(value).split('\n').forEach(function(part){var line='';Array.from(part).forEach(function(ch){if(line&&ctx.measureText(line+ch).width>width){lines.push(line);line=ch;}else line+=ch;});lines.push(line);});return lines;}
+    function box(ctx,value,x,y,w,h,size,bold,color){var lines,step;do{lines=wrap(ctx,value,size,bold,w);step=Math.ceil(size*1.4);if(lines.length*step<=h)break;size--;}while(size>=12);if(lines.length*step>h)throw new Error('가이드 문구가 너무 길어요. 상품명·이름·이미지 설명 길이를 줄여 주세요.');ctx.fillStyle=color||'#263247';ctx.font=(bold?'bold ':'')+size+'px '+font;ctx.textBaseline='top';lines.forEach(function(line,j){ctx.fillText(line,x,y+j*step);});}
+    function contain(ctx,img,x,y,w,h){var scale=Math.min(w/img.width,h/img.height),iw=img.width*scale,ih=img.height*scale;ctx.drawImage(img,x+(w-iw)/2,y+(h-ih)/2,iw,ih);}
+    for(var i=0;i<6;i++){
+      var page=model[i],p=page.phase,canvas=document.createElement('canvas');canvas.width=1240;canvas.height=1754;var ctx=canvas.getContext('2d');if(!ctx)throw new Error('PDF 캔버스를 사용할 수 없어요.');ctx.fillStyle='#fff';ctx.fillRect(0,0,1240,1754);
+      box(ctx,'CREATOR / VISUAL GUIDELINE',88,57,1064,30,20,true,'#293bac');
+      box(ctx,page.name+'님 콘텐츠 가이드라인',88,102,1064,55,32,true);
+      box(ctx,'상품: '+page.product+'  |  공구: '+page.campaignDates,88,166,1064,58,22,true);
+      box(ctx,p.number+'. '+p.title,88,237,1064,48,34,true,'#293bac');
+      box(ctx,p.dates+'  ·  '+p.relative,88,294,1064,44,28,true,'#293bac');
+      ctx.fillStyle='#f0f3f8';ctx.fillRect(88,350,1064,750);
+      if(photos[i]){contain(ctx,photos[i],88,350,1064,750);}else{
+        for(var j=0;j<3;j++){var left=108+j*350;ctx.fillStyle='#fff';ctx.fillRect(left,455,324,495);ctx.strokeStyle='#d7deed';ctx.strokeRect(left,455,324,495);ctx.fillStyle='#e5eaf4';ctx.fillRect(left+25,485,274,280);ctx.fillStyle='#bcc9e1';ctx.beginPath();ctx.arc(left+162,558,38,0,Math.PI*2);ctx.fill();ctx.fillRect(left+105,610,114,105);box(ctx,SHOTS[i][j],left+20,810,284,78,26,true,'#293bac');box(ctx,'컷 '+(j+1),left+20,902,284,34,22,false,'#657084');}
+        box(ctx,unknownProduct(c.product)?'상품 미정 · 확정 전에는 질문 콘텐츠부터 준비해요.':'상품과 실제 촬영 환경에 맞춰 응용해 주세요.',118,1005,1004,60,23,false,'#657084');
+      }
+      if(packshot&&photos[i]){ctx.fillStyle='#fff';ctx.fillRect(952,860,180,220);contain(ctx,packshot,962,870,160,160);box(ctx,'실제 제품 참고',962,1040,160,30,17,true,'#293bac');}
+      box(ctx,photos[i]?assets[i].caption:'촬영 구도 예시 · 실제 상품 사진 아님',88,1114,1064,44,18,false,'#657084');
+      box(ctx,'촬영 지시: '+page.instruction,88,1170,1064,84,28,true);
+      box(ctx,p.tasks.map(function(t){return '• '+t;}).join('\n'),88,1265,1064,147,23,false);
+      var note=p.advice+'\n팀 제안: '+page.idea;
+      if(i===0)note+='\n제안 배치 1회는 원문 횟수 미명시 항목의 참고안이며 계약상 필수 수량이 아니에요.';
+      if(i===3)note+='\n광고·협찬 관계를 명확히 표시하고 실제 후기·사진·음원 사용 허락을 확인해요.';
+      if(i===5)note+='\n미확정 가격·구성·배송·교환·효능·혜택을 임의로 약속하지 않아요.';
+      box(ctx,note,88,1428,1064,150,20,false,'#596174');
+      box(ctx,'참고: crea__tus 원본 릴스  '+page.source+'\n참고 콘텐츠 루틴으로 성과를 보장하지 않아요. PDF는 자동 발송되지 않아요.',88,1600,1064,59,17,false,'#657084');
+      box(ctx,'콘텐츠 가이드라인  |  '+(i+1)+' / 6',88,1690,1064,30,18,false,'#657084');
+      var binary=atob(canvas.toDataURL('image/jpeg',0.94).split(',')[1]),out=new Uint8Array(binary.length);for(var k=0;k<binary.length;k++)out[k]=binary.charCodeAt(k);jpegPages.push(out);canvas.width=1;canvas.height=1;
+    }
+    return jpegPDF(jpegPages);
+  }
+  function pdfFilename(c){return (String(c.name||'인플루언서')+'_공구_가이드라인_'+String(c.start||'일정미정')).replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_')+'.pdf';}
+  function savePDF(blob,c){var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=pdfFilename(c);document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},120000);}
+  function transferCopy(c){return String(c.name||'인플루언서')+'님, '+product(c)+' 공구 콘텐츠 가이드라인을 전달드려요. 공구 일정은 '+range(c.start,c.end)+'입니다. 첨부 PDF의 단계별 촬영 예시와 일정·수량을 확인해 주세요. 미확정 정보는 게시 전 확인 부탁드려요.';}
+  async function copyTransfer(c){var value=transferCopy(c);try{await navigator.clipboard.writeText(value);toast('전달 문구를 복사했어요. PDF를 첨부해 직접 보내 주세요.');}catch(e){var ta=document.createElement('textarea');ta.value=value;ta.style.cssText='position:fixed;left:0;top:0;width:250px;height:100px';document.body.appendChild(ta);ta.focus();ta.select();var ok=document.execCommand('copy');ta.remove();toast(ok?'전달 문구를 복사했어요. PDF는 직접 첨부해 주세요.':'문구 복사가 차단됐어요. 브라우저의 클립보드 권한을 확인해 주세요.',!ok);}}
+  async function shareGuideline(c,button){button.disabled=true;button.textContent='공유 준비 중…';try{var blob=await buildGuidelinePDF(c),file=new File([blob],pdfFilename(c),{type:'application/pdf'});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'공구 콘텐츠 가이드라인',text:transferCopy(c)});}catch(e){if(e.name==='AbortError')return;savePDF(blob,c);toast('공유창을 열지 못해 PDF로 저장했어요. 전달 문구 복사를 이용해 주세요.');}}else{savePDF(blob,c);toast('이 브라우저는 파일 공유를 지원하지 않아 PDF로 저장했어요. 전달 문구 복사 후 직접 첨부해 주세요.');}}catch(e){toast('가이드 공유 실패: '+errorText(e),true);}finally{if(button.isConnected){button.disabled=false;button.textContent='가이드 공유';}}}
+
+  async function downloadGuideline(c,button){
+    button.disabled=true;button.textContent='PDF 준비 중…';
+    try {var blob=await buildGuidelinePDF(c),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(String(c.name||'인플루언서')+'_공구_가이드라인_'+String(c.start||'일정미정')).replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_')+'.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},120000);toast('가이드라인 PDF를 만들었어요. 다운로드 목록을 확인해 주세요. 자동 발송되지 않아요.');}
+    catch(e){toast('PDF 생성 실패: '+errorText(e),true);}
+    finally {if(button.isConnected){button.disabled=false;button.textContent='가이드라인 PDF';}}
+  }
+  window.VLGroupbuy={config:pdfConfig,guidelineModel:guidelineModel,buildGuidelinePDF:buildGuidelinePDF,jpegPDF:jpegPDF,windows:windows,transferCopy:transferCopy,guidelinePages:guidelinePages,exampleAsset:exampleAsset,refreshExamples:function(){var c=schedules().find(function(x){return String(x.id)===selectedId;});var root=$('#groupbuyView');if(c&&root)return hydrateExamples(c,root);}};
 
   function renderGroupbuyPage() {
     var root = $('#groupbuyView'); if (!root) return;
@@ -2134,12 +2276,12 @@ function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'),
     root.innerHTML = '<header class="gb-header"><div><span class="gb-eyebrow">VERY LABEL / GROUP BUY</span><h1>공구 실행 플랜</h1><p class="gb-sub">일정별 콘텐츠와 실행 수를 함께 확인해요. 한국시간 ' + esc(now) + ' 기준</p></div>' +
       (canEdit ? '<button type="button" class="gb-button gb-primary" data-gb-new' + (saving ? ' disabled' : '') + '>일정 추가</button>' : '') + '</header>' +
       '<div class="gb-access">' + (canEdit ? '관리자 편집 가능' : '읽기 전용') + ' · 전체 팀원 열람 / 편집: 박하운·염찬웅·오종호</div>' +
-      '<div class="gb-summary-grid" role="group" aria-label="공구 일정 선택">' + list.map(function (c) {
+      calendarHTML(list, now) + '<h2 style="font-size:18px;margin:0 0 10px">인플루언서별 공구 일정</h2><div class="gb-summary-grid" role="group" aria-label="공구 일정 선택">' + list.map(function (c) {
         var active = String(c.id) === selectedId;
         return '<button type="button" class="gb-summary' + (active ? ' gb-selected' : '') + '" data-gb-select="' + esc(c.id) + '" aria-pressed="' + active + '"><span class="gb-summary-name">' + esc(c.name || '이름 미정') + '</span><span class="gb-summary-date">' + esc(range(c.start, c.end)) + '</span><span class="gb-summary-product">' + esc(product(c)) + '</span><span class="gb-badges">' + badge(campaignStatus(c, now), active ? 'blue' : '') + (unknownProduct(c.product) ? badge('상품 미확정', 'warn') : '') + (!String(c.manager || '').trim() ? badge('담당자 미지정') : '') + '</span></button>';
       }).join('') + '</div>' +
       (selected ? '<section class="gb-detail" aria-label="선택 일정 상세"><div class="gb-detail-heading"><div><h2>' + esc(selected.name || '이름 미정') + ' <span class="gb-sub">공구</span></h2><p class="gb-selected-date">' + esc(range(selected.start, selected.end)) + '</p></div>' +
-        (canEdit ? '<button type="button" class="gb-button" data-gb-edit' + (saving ? ' disabled' : '') + '>일정 수정</button>' : '') + '</div>' +
+        '<div class="gb-detail-actions"><button type="button" class="gb-button gb-primary" data-gb-pdf>가이드라인 PDF</button><button type="button" class="gb-button" data-gb-share>가이드 공유</button><button type="button" class="gb-button" data-gb-copy>전달 문구 복사</button>' + (canEdit ? '<button type="button" class="gb-button" data-gb-edit' + (saving ? ' disabled' : '') + '>일정 수정</button>' : '') + '</div></div><p class="gb-pdf-note">선택한 인플루언서의 일정·콘텐츠 가이드를 PDF로 내려받아요. 내부 메모·담당자·진행 수는 제외되며 자동 발송되지 않아요.</p>' +
         '<dl class="gb-meta"><div><dt>상품</dt><dd>' + esc(product(selected)) + '</dd></div><div><dt>담당자</dt><dd>' + esc(selected.manager || '미지정') + '</dd></div></dl>' +
         (selected.memo ? '<p class="gb-memo"><b>메모</b> ' + esc(selected.memo) + '</p>' : '') +
         '<details class="gb-guides"><summary>영상 요약 · 상품별 적용 아이디어</summary><aside class="gb-source"><div class="gb-badges">' + badge('출처', 'blue') + '<a href="' + SOURCE + '" target="_blank" rel="noopener noreferrer">crea__tus · 원본 릴스 보기 ↗</a></div><p>출처의 실행 흐름을 일정에 맞춰 배치했어요. 횟수가 없는 후기·게시물의 1회 목표는 <b>운영 배치안</b>으로 구분해요. 영상은 참고용 콘텐츠 루틴이며 매출·성과를 보장하지 않아요. 날짜가 지나도 실행 수는 자동으로 채워지지 않아요.</p></aside>' +
@@ -2147,9 +2289,17 @@ function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'),
         '<p class="gb-progress-help" role="status">' + (saving ? '저장 중… 잠시만 기다려 주세요.' : canEdit ? '+ / −로 실제 실행한 횟수만 기록해요. 목표 달성 표시는 입력값 기준이에요.' : '실제 실행 수를 확인하는 화면이에요. 수정은 관리자에게 요청해 주세요.') + '</p>' +
         '<div class="gb-phases">' + PHASES.map(function (p, i) { return phaseHTML(selected, p, i, now, canEdit); }).join('') + '</div></section>' :
         '<div class="gb-empty">등록된 공구 일정이 없어요.' + (canEdit ? ' 일정 추가로 시작해 주세요.' : ' 관리자에게 일정 등록을 요청해 주세요.') + '</div>');
+    if(selected)hydrateExamples(selected,root);
     root.onclick = async function (event) {
       var button = event.target.closest('button'); if (!button || !root.contains(button) || button.disabled) return;
       if (button.hasAttribute('data-gb-select')) { selectedId = button.dataset.gbSelect; renderGroupbuyPage(); return; }
+      if (button.hasAttribute('data-gb-month')) { var md=new Date(calendarMonth+'-01T00:00:00Z');md.setUTCMonth(md.getUTCMonth()+Number(button.dataset.gbMonth));calendarMonth=md.toISOString().slice(0,7);calendarDay=calendarMonth+'-01';renderGroupbuyPage();return; }
+      if (button.hasAttribute('data-gb-today')) {calendarMonth=todayKST().slice(0,7);calendarDay=todayKST();renderGroupbuyPage();return;}
+      if (button.hasAttribute('data-gb-day')) {calendarDay=button.dataset.gbDay;calendarMonth=calendarDay.slice(0,7);renderGroupbuyPage();return;}
+      if (button.hasAttribute('data-gb-event')) {selectedId=button.dataset.gbEvent;calendarDay=button.dataset.gbDate;renderGroupbuyPage();var detail=root.querySelector('.gb-detail');if(detail)detail.scrollIntoView({behavior:'smooth',block:'start'});return;}
+      if (button.hasAttribute('data-gb-pdf')) {var pdfCampaign=schedules().find(function(c){return String(c.id)===selectedId;});if(pdfCampaign)await downloadGuideline(pdfCampaign,button);return;}
+
+      if (button.hasAttribute('data-gb-share') || button.hasAttribute('data-gb-copy')) {var shareCampaign=schedules().find(function(c){return String(c.id)===selectedId;});if(shareCampaign){if(button.hasAttribute('data-gb-copy'))await copyTransfer(shareCampaign);else await shareGuideline(shareCampaign,button);}return;}
       if (!admin() || saving) return;
       if (button.hasAttribute('data-gb-new')) { openSchedule(null); return; }
       var current = schedules().find(function (c) { return String(c.id) === selectedId; }); if (!current) return;
@@ -2223,6 +2373,10 @@ function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'),
   }
   window.renderGroupbuyPage = renderGroupbuyPage;
 }());
+
+
+/* Reviewed original product reference and generated shooting examples. */
+(function(){var base=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'guide-assets/':'https://chanoong2.github.io/verylabel-board/';var prefix=base==='guide-assets/'?'':'guide-';window.VLGroupbuy.config.imageProvider=async function(c,i){var set=/패딩|padding/i.test(c.product||'')?'coat':/빌베리|bilberry|베리라벨/i.test(c.product||'')?'berry':null;return set?{image:base+prefix+set+'-'+(i+1)+'.jpg',caption:set==='berry'?'촬영 참고 이미지':'패딩 촬영 구도 예시 · 실제 판매 상품 사진 아님'}:null;};window.VLGroupbuy.config.productImage=base+(base==='guide-assets/'?'verylabel-original.png':'guide-verylabel-original.png');})();
 
 /* ---------- 시작 ---------- */
 (function boot() {
