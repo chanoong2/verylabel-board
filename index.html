@@ -184,10 +184,12 @@ select.inp,.inp{border:1.5px solid var(--line);background:#fff;border-radius:12p
 .mailrow{display:flex;gap:6px}.mailrow .inp{flex:1;min-width:0}.wonrow{display:flex;gap:6px;align-items:center;margin-top:6px}.wonrow .inp{flex:1;min-width:0}
 #dealView{max-width:1180px;margin:24px auto;width:100%;padding:0 24px 40px}@media(max-width:700px){#dealView{padding:0 14px 30px;margin-top:16px}}
 .dhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}.dhead h2{margin:0 0 4px;font-size:24px}.dbtns{display:flex;gap:8px;flex-wrap:wrap}
-.dwho{margin:14px 0;flex-wrap:wrap}.dkpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}@media(max-width:700px){.dkpis{grid-template-columns:repeat(3,1fr)}}
+.dwho{margin:14px 0;flex-wrap:wrap}.dkpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
 .dkpi{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #E3E6F0;border-radius:12px;padding:12px}.dkpi b{display:block;font-size:24px;color:#293BAC}.dkpi span{font-size:13px;color:#666}
 .dsec{margin-top:22px}.dsec h3{margin:0 0 4px;font-size:18px}.dsec h3 .n{background:#293BAC;color:#fff;border-radius:99px;padding:1px 9px;font-size:13px;margin-left:4px}.dsec p{margin:0 0 8px}
 .dtbl td{font-size:14px}.dtbl .h{font-weight:800}.dtbl .nm{color:#777;font-size:12px}.dempty{padding:14px;border:1px dashed #D5D9E6;border-radius:12px;color:#999;text-align:center}
+.more-f{margin-top:12px;border:1px solid #E3E6F0;border-radius:12px;padding:10px 12px}.more-f>summary{cursor:pointer;font-weight:700;color:#555}.more-f[open]>summary{margin-bottom:8px}
+.cmbig{display:inline-block;background:#293BAC;color:#fff;font-weight:900;font-size:15px;border-radius:8px;padding:3px 10px}.cmbig.none{background:#F1F2F6;color:#999;font-size:12px;font-weight:700}
 .okc{color:#11663A;font-weight:700}.warnc{color:#B42318;font-weight:700}
 .dcard{background:#fff;border:1px solid #E3E6F0;border-radius:12px;padding:12px;margin-bottom:8px}.dtop{display:flex;justify-content:space-between;gap:8px}.dkv{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:13px}.dkv .btn{margin-left:auto}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}
@@ -1233,7 +1235,7 @@ function renderChips() {
   $('#chips').innerHTML = items.map(function (x) { return '<button class="chip' + (S.status === x[0] ? ' on' : '') + '" data-s="' + x[0] + '">' + x[0] + ' <b>' + x[1] + '</b></button>'; }).join('') +
     '<button class="chip fu' + (S.status === '팔로업' ? ' on' : '') + '" data-s="팔로업">팔로업 필요 <b>' + fu + '</b></button>' +
     '<button class="chip mail' + (S.status === '메일' ? ' on' : '') + '" data-s="메일">✉ 메일 보냄 <b>' + rows.filter(function (r) { return !!r.mailSentAt; }).length + '</b></button>' +
-    '<button class="chip gb' + (S.status === '관심' ? ' on' : '') + '" data-s="관심">공구 관심 <b>' + rows.filter(function (r) { return r.stage === '공구관심'; }).length + '</b></button>' +
+    '<button class="chip gb' + (S.status === '관심' ? ' on' : '') + '" data-s="관심">샘플 대기 <b>' + rows.filter(function (r) { return r.stage === '공구관심'; }).length + '</b></button>' +
     (S.status === '오늘발송' ? '<button class="chip on" data-s="오늘발송">오늘 제안</button>' : '');
   $$('#chips .chip').forEach(function (b) { b.onclick = function () { if (b.dataset.s === '승인') return showAllApproved(); S.status = b.dataset.s; S.sel = {}; renderChips(); renderList(); }; });
 }
@@ -1277,10 +1279,12 @@ function computeSoftDup() {
   [byC, byH].forEach(function (g) { Object.keys(g).forEach(function (k) { if (g[k].length > 1) g[k].forEach(function (r) { _softDup[r.id] = g[k].filter(function (x) { return x.id !== r.id; }).map(function (x) { return handleLabel(x) + '(' + x.owner + ')'; }).join(', '); }); }); });
 }
 function isRed(r) { return !!_softDup[r.id] || Number(r.dupHits) > 0; }
+function stLabel(s) { return s === '공구관심' ? '대기' : s; }
+function cmTxt(r) { var c = pctNum(r.commission); return c ? c + '%' : '수수료 미정'; }
 function dealTag(r) {
   var t = '';
   if (r.mailSentAt) t += '<span class="tag mail" title="' + esc((r.mailSentBy || '') + ' 메일 발송') + '">✉ ' + fmtYMD(r.mailSentAt) + '</span>';
-  if (r.stage && r.stage !== '영업대기') t += '<span class="tag stg stg-' + esc(r.stage) + '">' + esc(r.stage) + '</span>';
+  if (r.stage && r.stage !== '영업대기') t += '<span class="tag stg stg-' + esc(r.stage) + '">' + (r.stage === '공구관심' ? '샘플 대기' : esc(r.stage)) + ' · ' + cmTxt(r) + '</span>';
   return t;
 }
 function mailBtn(r) {
@@ -1347,7 +1351,7 @@ function renderList() {
   renderSelbar();
 }
 function stBadge(r) { return '<span class="badge st-' + esc(r.status) + (r.owner === S.me ? ' click' : '') + '">' + esc(r.status) + '</span>'; }
-if (MQ_M.addEventListener) MQ_M.addEventListener('change', function () { if (S.loaded && !S.view) renderList(); });
+if (MQ_M.addEventListener) MQ_M.addEventListener('change', function () { if (!S.loaded) return; if (!S.view) renderList(); else if (S.view === 'deals') renderDealBoard(); });
 function selRows() { return S.rows.filter(function (r) { return S.sel[r.id]; }); }
 function renderSelbar() {
   var bar = $('#selbar'), sel = selRows();
@@ -1682,15 +1686,15 @@ function openDetail(id, tab) {
     var fld = function (lb, fid, v, ph, typ) { return '<div class="fld"><label>' + lb + '</label><input class="inp" ' + (typ ? 'type="' + typ + '" ' : '') + 'id="' + fid + '" value="' + esc(v || '') + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + dis2 + '></div>'; };
     var cmv0 = pctNum(r.commission), cmMode = !cmv0 ? '' : (cmv0 === 25 || cmv0 === 30 ? String(cmv0) : 'etc'), fyn = r.writeFeeYN || '';
     var sb = function (id, val, cur, label) { return '<button data-v="' + val + '"' + (val === cur ? ' class="on"' : '') + dis2 + '>' + label + '</button>'; };
-    body = lock + '<div class="deal-flow"><span' + (r.mailSentAt ? ' class="done"' : '') + '>① 영업·메일</span><span' + (/공구관심|샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>② 공구 관심</span><span' + (/샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>③ 샘플 발송 (오종호)</span><span' + (/진행중|완료/.test(stg) ? ' class="done"' : '') + '>④ 공구 진행</span></div>' +
+    body = lock + '<div class="deal-flow"><span' + (r.mailSentAt ? ' class="done"' : '') + '>① 영업·메일</span><span' + (/공구관심|샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>② 대기 (공구 관심)</span><span' + (/샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>③ 샘플발송 (오종호)</span></div>' +
       '<div class="dealbox"><div class="fld"><label>영업 메일</label><div class="mailrow"><input type="date" class="inp" id="gMail" value="' + esc(r.mailSentAt || '') + '"' + dis2 + '><button class="btn sm" id="gMailToday"' + dis2 + '>오늘 보냄</button></div>' + (r.mailSentBy ? '<div class="muted">' + esc(r.mailSentBy) + ' 기록</div>' : '') + '</div>' +
       '<div class="fld"><label>수수료율</label><div class="seg" id="gCmSeg">' + sb('gCmSeg', '25', cmMode, '25%') + sb('gCmSeg', '30', cmMode, '30%') + sb('gCmSeg', 'etc', cmMode, '직접') + '</div><input class="inp' + (cmMode === 'etc' ? '' : ' hidden') + '" id="gCm" inputmode="decimal" style="margin-top:6px" placeholder="예: 27" value="' + esc(cmMode === 'etc' ? r.commission : (cmv0 || '')) + '"' + dis2 + '></div>' +
       '<div class="fld"><label>원고료</label><div class="seg" id="gFySeg">' + sb('gFySeg', '없음', fyn, '없음') + sb('gFySeg', '있음', fyn, '있음') + '</div><div class="wonrow' + (fyn === '있음' ? '' : ' hidden') + '" id="gFeeRow"><input class="inp" id="gFee" inputmode="numeric" placeholder="금액" value="' + (num(r.writeFee) ? num(r.writeFee).toLocaleString() : '') + '"' + dis2 + '><span>원</span></div></div></div>' +
-      '<div class="fld full" style="margin-top:12px"><label>진행 단계</label><div class="seg" id="gSt" style="flex-wrap:wrap">' + [''].concat(VL.DEAL_STAGES).map(function (s2) { return '<button data-g="' + s2 + '"' + (s2 === stg ? ' class="on"' : '') + dis2 + '>' + (s2 || '해당 없음') + '</button>'; }).join('') + '</div><div class="muted" style="margin-top:4px">공구에 관심 있다고 하면 <b>공구관심</b>으로 바꿔 주세요. 오종호님 샘플 발송 목록에 바로 올라가요.</div></div>' +
-      '<div class="grid2" style="margin-top:12px">' + fld('수령인 이름', 'gRn', r.recvName) + fld('수령인 연락처', 'gRp', r.recvPhone, '010-0000-0000') +
-      '<div class="fld full"><label>배송 주소</label><input class="inp" id="gRa" value="' + esc(r.recvAddr || '') + '"' + dis2 + '></div>' +
-      fld('샘플 품목·수량', 'gIt', r.sampleItem, '예: 14병 1박스') + fld('샘플 발송일', 'gSd', r.dateSample, '', 'date') + fld('송장번호', 'gTr', r.tracking) + fld('공구 시작일', 'gGs', r.dateGbStart, '', 'date') + fld('공구 종료일', 'gGe', r.dateGbEnd, '', 'date') +
-      fld('매출(원)', 'gSa', num(r.sales) ? num(r.sales).toLocaleString() : '', '예: 3,500,000') + '</div>' +
+      '<div class="fld full" style="margin-top:12px"><label>진행 단계</label><div class="seg" id="gSt" style="flex-wrap:wrap">' + ['', '공구관심', '샘플발송'].concat(['영업대기', '진행중', '완료'].indexOf(stg) >= 0 ? [stg] : []).map(function (s2) { return '<button data-g="' + s2 + '"' + (s2 === stg ? ' class="on"' : '') + dis2 + '>' + (s2 ? stLabel(s2) : '해당 없음') + '</button>'; }).join('') + '</div><div class="muted" style="margin-top:4px">공구에 관심 있다고 하면 <b>대기</b>로 바꿔 주세요. 오종호님 샘플 발송 목록에 바로 올라가요.</div></div>' +
+      '<div class="grid2" style="margin-top:12px">' + fld('받는 사람', 'gRn', r.recvName) + fld('연락처', 'gRp', r.recvPhone, '010-0000-0000') +
+      '<div class="fld full"><label>배송 주소</label><input class="inp" id="gRa" value="' + esc(r.recvAddr || '') + '"' + dis2 + '></div>' + fld('샘플 발송일', 'gSd', r.dateSample, '', 'date') + '</div>' +
+      '<details class="more-f"' + (r.sampleItem || r.tracking || r.dateGbStart || num(r.sales) ? ' open' : '') + '><summary>추가 정보 (품목·송장·공구 기간·매출)</summary><div class="grid2">' + fld('샘플 품목·수량', 'gIt', r.sampleItem, '예: 14병 1박스') + fld('송장번호', 'gTr', r.tracking) + fld('공구 시작일', 'gGs', r.dateGbStart, '', 'date') + fld('공구 종료일', 'gGe', r.dateGbEnd, '', 'date') +
+      fld('매출(원)', 'gSa', num(r.sales) ? num(r.sales).toLocaleString() : '', '예: 3,500,000') + '</div></details>' +
       '<div class="notice info" style="margin-top:12px" id="gCalc"></div><div class="muted" style="margin-top:6px">받는 사람 정보는 배송용 개인정보예요. 공구가 끝나 필요 없어지면 지워 주세요.</div>';
     foot = canEdit ? '<span style="flex:1"></span><button class="btn" data-close>닫기</button><button class="btn primary" id="gSave">저장</button>' : '<button class="btn primary" data-close>닫기</button>';
   } else {
@@ -2168,28 +2172,26 @@ function renderDealBoard() {
   var root = $('#dealView'); if (!root) return;
   var who = S.dealWho || '전체', admin = isAppAdmin();
   var base = S.rows.filter(function (r) { return /공구관심|샘플발송|진행중|완료/.test(r.stage || '') && (who === '전체' || r.owner === who); });
-  var secs = [['공구관심', '샘플 보낼 곳', '공구 관심이 확인된 인플루언서예요. 오종호님이 주소 확인 후 샘플을 보내요.'], ['샘플발송', '샘플 보냄', '샘플을 보낸 곳이에요. 송장과 공구 일정을 확인하세요.'], ['진행중', '공구 진행중', ''], ['완료', '공구 완료', '']];
-  var by = {}; secs.forEach(function (s) { by[s[0]] = base.filter(function (r) { return r.stage === s[0]; }).sort(function (a, b) { return String(b.interestAt || b.dateSample || b.updatedAt).localeCompare(String(a.interestAt || a.dateSample || a.updatedAt)); }); });
+  var secs = [['공구관심', '대기', ''], ['샘플발송', '샘플발송', '']];
+  var by = {}; secs.forEach(function (s) { by[s[0]] = base.filter(function (r) { return s[0] === '샘플발송' ? /샘플발송|진행중|완료/.test(r.stage) : r.stage === s[0]; }).sort(function (a, b) { return String(b.interestAt || b.dateSample || b.updatedAt).localeCompare(String(a.interestAt || a.dateSample || a.updatedAt)); }); });
   var mailCnt = S.rows.filter(function (r) { return r.mailSentAt && (who === '전체' || r.owner === who); }).length;
   var tbl = function (st, list) {
     if (!list.length) return '<div class="dempty">없음</div>';
+    var wait = st === '공구관심';
+    var last = function (r) { return wait ? (r.recvAddr ? '<span class="okc">주소 있음</span>' : '<span class="warnc">주소 필요</span>') : ('<span class="muted">' + (r.dateSample ? fmtYMD(r.dateSample) + ' 발송' : '발송일 미입력') + '</span>'); };
     if (MQ_M.matches) return list.map(function (r) {
-      return '<div class="dcard" data-id="' + r.id + '"><div class="dtop"><b>@' + esc(r.handle) + '</b><span class="who">' + av(r.owner, 18) + esc(r.owner) + '</span></div><div class="muted">' + esc(r.name || '') + ' · 팔로워 ' + fmtF(r.followers) + '</div>' +
-        '<div class="dkv"><span>수수료 <b>' + (pctNum(r.commission) ? pctNum(r.commission) + '%' : '-') + '</b></span><span>원고료 <b>' + feeTxt(r) + '</b></span>' + (r.mailSentAt ? '<span>메일 ' + fmtYMD(r.mailSentAt) + '</span>' : '') + '</div>' +
-        (st === '공구관심' ? '<div class="dkv">' + (r.recvAddr ? '<span class="okc">주소 있음</span>' : '<span class="warnc">주소 필요</span>') + (admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄 처리</button>' : '') + '</div>' : '<div class="dkv"><span>발송 ' + fmtYMD(r.dateSample) + '</span>' + (r.tracking ? '<span>송장 ' + esc(r.tracking) + '</span>' : '') + (r.dateGbStart ? '<span>공구 ' + fmtYMD(r.dateGbStart) + '~' + fmtYMD(r.dateGbEnd) + '</span>' : '') + '</div>') + '</div>';
+      return '<div class="dcard" data-id="' + r.id + '"><div class="dtop"><span><b>@' + esc(r.handle) + '</b> <span class="muted">' + esc(r.owner) + '</span></span><span class="cmbig' + (pctNum(r.commission) ? '' : ' none') + '">' + cmTxt(r) + '</span></div>' +
+        '<div class="dkv"><span>원고료 <b>' + feeTxt(r) + '</b></span>' + last(r) + (wait && admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄</button>' : '') + '</div></div>';
     }).join('');
-    return '<table class="tbl dtbl"><thead><tr><th>인플루언서</th><th>담당 영업자</th><th>수수료</th><th>원고료</th><th>메일</th>' + (st === '공구관심' ? '<th>관심 등록</th><th>받는 곳</th><th></th>' : '<th>샘플 발송</th><th>송장</th><th>공구 기간</th>' + (st === '진행중' || st === '완료' ? '<th>매출</th>' : '')) + '</tr></thead><tbody>' + list.map(function (r) {
-      return '<tr data-id="' + r.id + '"><td><div class="h">@' + esc(r.handle) + '</div><div class="nm">' + esc(r.name || '') + ' · ' + fmtF(r.followers) + '</div></td><td><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span></td>' +
-        '<td><b>' + (pctNum(r.commission) ? pctNum(r.commission) + '%' : '-') + '</b></td><td>' + feeTxt(r) + '</td><td>' + (r.mailSentAt ? fmtYMD(r.mailSentAt) : '-') + '</td>' +
-        (st === '공구관심' ? '<td>' + fmtYMD(r.interestAt) + '</td><td>' + (r.recvAddr ? '<span class="okc">' + esc(r.recvName || '주소 있음') + '</span>' : '<span class="warnc">주소 필요</span>') + '</td><td>' + (admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄</button>' : '') + '</td>'
-          : '<td>' + fmtYMD(r.dateSample) + '</td><td>' + esc(r.tracking || '-') + '</td><td>' + (r.dateGbStart ? fmtYMD(r.dateGbStart) + ' ~ ' + fmtYMD(r.dateGbEnd) : '-') + '</td>' + (st === '진행중' || st === '완료' ? '<td>' + (num(r.sales) ? num(r.sales).toLocaleString() + '원' : '-') + '</td>' : '')) + '</tr>';
+    return '<table class="tbl dtbl"><thead><tr><th>인플루언서</th><th>담당</th><th>수수료율</th><th>원고료</th><th>' + (wait ? '받는 곳' : '발송일') + '</th>' + (wait ? '<th></th>' : '') + '</tr></thead><tbody>' + list.map(function (r) {
+      return '<tr data-id="' + r.id + '"><td><div class="h">@' + esc(r.handle) + '</div><div class="nm">' + esc(r.name || '') + '</div></td><td><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span></td>' +
+        '<td><span class="cmbig' + (pctNum(r.commission) ? '' : ' none') + '">' + cmTxt(r) + '</span></td><td>' + feeTxt(r) + '</td><td>' + last(r) + '</td>' + (wait ? '<td>' + (admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄</button>' : '') + '</td>' : '') + '</tr>';
     }).join('') + '</tbody></table>';
   };
   var dl = sheetLink('deals'), ml = sheetLink('mail');
-  root.innerHTML = '<div class="dhead"><div><h2>샘플·공구 현황</h2><p class="muted">영업자가 <b>공구관심</b>으로 바꾼 인플루언서를 오종호님이 보고 샘플을 보내요. 수수료·원고료는 각 인플루언서 상세의 <b>공구·샘플</b> 탭에서 입력해요.</p></div>' +
+  root.innerHTML = '<div class="dhead"><div><h2>샘플·공구 현황</h2><p class="muted">공구 관심 → <b>대기</b> → 오종호님 <b>샘플발송</b></p></div>' +
     '<div class="dbtns">' + (dl ? '<a class="btn yellow" href="' + esc(dl) + '" target="_blank" rel="noopener">구글시트로 열기 ↗</a>' : '') + (ml ? '<a class="btn" href="' + esc(ml) + '" target="_blank" rel="noopener">메일 발송 기록 시트 ↗</a>' : '') + '<button class="btn" id="dXls">엑셀 다운로드</button></div></div>' +
     '<div class="seg dwho" id="dWho">' + ['전체'].concat(VL.MEMBERS).map(function (m) { return '<button data-w="' + esc(m) + '"' + (m === who ? ' class="on"' : '') + '>' + esc(m) + '</button>'; }).join('') + '</div>' +
-    '<div class="dkpis">' + secs.map(function (s) { return '<a class="dkpi" href="#d-' + s[0] + '"><b>' + by[s[0]].length + '</b><span>' + s[1] + '</span></a>'; }).join('') + '<div class="dkpi"><b>' + mailCnt + '</b><span>메일 보낸 곳</span></div></div>' +
     secs.map(function (s) { return '<section class="dsec" id="d-' + s[0] + '"><h3>' + s[1] + ' <span class="n">' + by[s[0]].length + '</span></h3>' + (s[2] ? '<p class="muted">' + s[2] + '</p>' : '') + tbl(s[0], by[s[0]]) + '</section>'; }).join('');
   $$('#dWho button').forEach(function (b) { b.onclick = function () { S.dealWho = b.dataset.w; renderDealBoard(); }; });
   $('#dXls').onclick = function () { openDeals(who); };
