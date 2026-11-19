@@ -149,6 +149,22 @@ select.inp,.inp{border:1.5px solid var(--line);background:#fff;border-radius:12p
 
 /* cards (mobile) */
 .cards{display:none}
+.more{text-align:center;margin:14px 0 6px}.more .btn{min-width:220px}
+.rowacts{display:flex;gap:6px;justify-content:flex-end}
+.mailbtn{white-space:nowrap}.mailbtn.on{background:#EEF1FF;border-color:#293BAC;color:#293BAC;font-weight:800}
+.tag.mail{background:#EEF1FF;color:#293BAC}.tag.stg{background:#FFF7CC;color:#6B5300}.tag.stg-샘플발송{background:#E6F6EC;color:#11663A}.tag.stg-진행중,.tag.stg-완료{background:#E8EAF8;color:#1F2C80}
+.chip.mail.on{background:#293BAC;color:#fff}.chip.gb.on{background:#FFE600;color:#000}
+.deal-flow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.deal-flow span{font-size:12px;padding:5px 9px;border-radius:99px;background:#F1F2F6;color:#777;font-weight:700}.deal-flow span.done{background:#293BAC;color:#fff}
+.dealbox{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px;border:1px solid #E3E6F0;border-radius:12px;background:#FAFBFF}@media(max-width:700px){.dealbox{grid-template-columns:1fr}}
+.mailrow{display:flex;gap:6px}.mailrow .inp{flex:1;min-width:0}.wonrow{display:flex;gap:6px;align-items:center;margin-top:6px}.wonrow .inp{flex:1;min-width:0}
+#dealView{max-width:1180px;margin:24px auto;width:100%;padding:0 24px 40px}@media(max-width:700px){#dealView{padding:0 14px 30px;margin-top:16px}}
+.dhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-end}.dhead h2{margin:0 0 4px;font-size:24px}.dbtns{display:flex;gap:8px;flex-wrap:wrap}
+.dwho{margin:14px 0;flex-wrap:wrap}.dkpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}@media(max-width:700px){.dkpis{grid-template-columns:repeat(3,1fr)}}
+.dkpi{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #E3E6F0;border-radius:12px;padding:12px}.dkpi b{display:block;font-size:24px;color:#293BAC}.dkpi span{font-size:13px;color:#666}
+.dsec{margin-top:22px}.dsec h3{margin:0 0 4px;font-size:18px}.dsec h3 .n{background:#293BAC;color:#fff;border-radius:99px;padding:1px 9px;font-size:13px;margin-left:4px}.dsec p{margin:0 0 8px}
+.dtbl td{font-size:14px}.dtbl .h{font-weight:800}.dtbl .nm{color:#777;font-size:12px}.dempty{padding:14px;border:1px dashed #D5D9E6;border-radius:12px;color:#999;text-align:center}
+.okc{color:#11663A;font-weight:700}.warnc{color:#B42318;font-weight:700}
+.dcard{background:#fff;border:1px solid #E3E6F0;border-radius:12px;padding:12px;margin-bottom:8px}.dtop{display:flex;justify-content:space-between;gap:8px}.dkv{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:13px}.dkv .btn{margin-left:auto}
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}
 .card.sel{border-color:var(--blue);background:#F5F7FF}
 .card .meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:6px;font-size:13.5px;color:var(--sub)}
@@ -427,8 +443,8 @@ textarea.inp{resize:vertical;min-height:80px;line-height:1.6}
 <script>
 /* ===== VERY LABEL 인플루언서 보드 공용 로직 (서버/미리보기 공용) ===== */
 var VL = (function () {
-  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast','following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt','dateWait','dateProposed','dateResult','stage','recvName','recvPhone','recvAddr','dateSample','sampleItem','tracking','dateGbStart','dateGbEnd','commission','sales'];
-  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도','팔로잉','게시물수','참여율(%)','평균좋아요','평균댓글','최근게시일','협찬글수','계정유형','인스타카테고리','외부링크','등급','적합도','분석일시','대기일','제안일','결과일(승인/거절)','진행단계','수령인','수령인연락처','배송주소','샘플발송일','샘플품목','송장번호','공구시작일','공구종료일','수수료(%)','매출(원)'];
+  var FIELDS = ['id','platform','handle','key','name','url','followers','category','contact','owner','status','offer','hook','memo','createdAt','createdBy','updatedAt','updatedBy','lastContactAt','lastContactBy','contactCount','version','bio','dupHits','dupLast','following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt','dateWait','dateProposed','dateResult','stage','recvName','recvPhone','recvAddr','dateSample','sampleItem','tracking','dateGbStart','dateGbEnd','commission','sales','mailSentAt','mailSentBy','writeFeeYN','writeFee','interestAt'];
+  var LABELS = ['ID','플랫폼','아이디','중복키(수정금지)','이름/닉네임','링크','팔로워','카테고리','연락처','담당자','상태','제안유형','개인화 한줄','메모','등록일시','등록자','수정일시','수정자','최근연락일시','최근연락자','연락횟수','버전','소개글','중복시도횟수','최근중복시도','팔로잉','게시물수','참여율(%)','평균좋아요','평균댓글','최근게시일','협찬글수','계정유형','인스타카테고리','외부링크','등급','적합도','분석일시','대기일','제안일','결과일(승인/거절)','진행단계','수령인','수령인연락처','배송주소','샘플발송일','샘플품목','송장번호','공구시작일','공구종료일','수수료(%)','매출(원)','메일발송일','메일발송자','원고료유무','원고료(원)','공구관심일'];
   var MEMBERS = ['유경웅','박하운','염찬웅','강현관'];
   function setMembers(list) { if (!list || !list.length) return MEMBERS; var seen = {}, clean = []; list.forEach(function (n) { n = String(n == null ? '' : n).trim(); if (n && !seen[n]) { seen[n] = 1; clean.push(n); } }); MEMBERS.length = 0; clean.forEach(function (n) { MEMBERS.push(n); }); return MEMBERS; }
   var STATUSES = ['대기','제안중','승인','거절'];
@@ -439,8 +455,8 @@ var VL = (function () {
   var PLATFORMS = ['인스타그램','유튜브','틱톡','블로그','기타'];
   var CATEGORIES = ['건강/웰니스','다이어트/운동','뷰티','육아/맘','푸드/요리','일상/라이프','기타'];
   var OFFERS = ['제품 협찬','유료 광고','공동구매','장기 앰배서더'];
-  var EDITABLE = ['name','url','followers','category','contact','status','offer','hook','memo','dateWait','dateProposed','dateResult','stage','recvName','recvPhone','recvAddr','dateSample','sampleItem','tracking','dateGbStart','dateGbEnd','commission','sales'];
-  var DEAL_STAGES = ['영업대기','샘플발송','진행중','완료'];
+  var EDITABLE = ['name','url','followers','category','contact','status','offer','hook','memo','dateWait','dateProposed','dateResult','stage','recvName','recvPhone','recvAddr','dateSample','sampleItem','tracking','dateGbStart','dateGbEnd','commission','sales','mailSentAt','writeFeeYN','writeFee'];
+  var DEAL_STAGES = ['영업대기','공구관심','샘플발송','진행중','완료'];
   var ANA = ['following','posts','engRate','avgLikes','avgComments','lastPost','adCount','acctType','igCategory','extLink','tier','fit','analyzedAt'];
   var TAKEOVER_DAYS = 14;   // 등록 후 14일간 연락 없는 '발굴' 건은 다른 담당자가 가져올 수 있음
   var RESEND_HOURS = 24;    // 24시간 안에 같은 사람에게 다시 발송 표시하면 막음
@@ -756,6 +772,12 @@ var VL = (function () {
       if (patch[k] !== undefined) nr[k] = k === 'followers' ? toNum(patch[k]) : (k.indexOf('date') === 0 ? okDate(patch[k]) : str(patch[k]));
     }
     if (nr.stage && DEAL_STAGES.indexOf(nr.stage) < 0) nr.stage = '';
+    if (patch.mailSentAt !== undefined) { nr.mailSentAt = okDate(patch.mailSentAt); if (nr.mailSentAt !== str(r.mailSentAt)) nr.mailSentBy = nr.mailSentAt ? user : ''; }
+    if (patch.writeFeeYN !== undefined) nr.writeFeeYN = ['있음', '없음'].indexOf(str(patch.writeFeeYN)) >= 0 ? str(patch.writeFeeYN) : '';
+    if (patch.writeFee !== undefined) nr.writeFee = str(patch.writeFee).replace(/[^0-9]/g, '');
+    if (nr.writeFeeYN !== '있음') nr.writeFee = '';
+    if (patch.commission !== undefined) { var cmn = parseFloat(str(patch.commission).replace(/[^0-9.]/g, '')); nr.commission = isFinite(cmn) && cmn > 0 && cmn <= 100 ? String(cmn) : ''; }
+    if (nr.stage === '공구관심' && str(r.stage) !== '공구관심' && !str(r.interestAt)) nr.interestAt = kstDate(now);
     nr.status = normStatus(nr.status);
     var oldSt = normStatus(r.status);
     if (nr.status !== oldSt) {
@@ -764,7 +786,7 @@ var VL = (function () {
     }
     if (!nr.dateWait) nr.dateWait = kstDate(r.createdAt);
     nr.updatedAt = now; nr.updatedBy = user; nr.version = Number(r.version || 1) + 1;
-    var detail = oldSt !== nr.status ? (oldSt + ' → ' + nr.status) : (str(r.stage) !== str(nr.stage) ? ('진행단계 ' + (str(r.stage) || '없음') + ' → ' + (nr.stage || '없음')) : '정보 수정');
+    var detail = oldSt !== nr.status ? (oldSt + ' → ' + nr.status) : (str(r.stage) !== str(nr.stage) ? ('진행단계 ' + (str(r.stage) || '없음') + ' → ' + (nr.stage || '없음')) : (str(r.mailSentAt) !== str(nr.mailSentAt) ? ('메일 발송 ' + (nr.mailSentAt || '취소')) : '정보 수정'));
     return { ok: true, row: nr, ops: [{ t: 'update', row: nr }], logs: [['수정', label(nr), detail]] };
   }
 
@@ -800,6 +822,20 @@ var VL = (function () {
     return { ok: true, done: done, skipped: skipped, ops: ops, logs: done.length ? [['발송완료', done.length + '명', done.map(label).join(', ').slice(0, 300)]] : [] };
   }
 
+  function markMail(rows, ids, user, now, clear) {
+    var done = [], skipped = [], ops = [], day = kstDate(now);
+    for (var i = 0; i < ids.length; i++) {
+      var r = find(rows, ids[i]);
+      if (!r) continue;
+      if (r.owner !== user && !isAdmin(user)) { skipped.push({ label: label(r), reason: r.owner + ' 담당' }); continue; }
+      var nr = copy(r);
+      nr.mailSentAt = clear ? '' : day; nr.mailSentBy = clear ? '' : user;
+      nr.updatedAt = now; nr.updatedBy = user; nr.version = Number(r.version || 1) + 1;
+      ops.push({ t: 'update', row: nr }); done.push(nr);
+    }
+    return { ok: true, done: done, skipped: skipped, ops: ops, logs: done.length ? [[clear ? '메일취소' : '메일발송', done.length + '명', done.map(label).join(', ').slice(0, 300)]] : [] };
+  }
+
   function remove(rows, id, user) {
     var r = find(rows, id);
     if (!r) return { ok: false, error: '없는 항목이에요' };
@@ -811,7 +847,7 @@ var VL = (function () {
     isAdmin: isAdmin, FIELDS: FIELDS, LABELS: LABELS, MEMBERS: MEMBERS, setMembers: setMembers, DEAL_STAGES: DEAL_STAGES, STATUSES: STATUSES, PLATFORMS: PLATFORMS,
     CATEGORIES: CATEGORIES, OFFERS: OFFERS, TAKEOVER_DAYS: TAKEOVER_DAYS, RESEND_HOURS: RESEND_HOURS,
     parseAccount: parseAccount, findDup: findDup, toNum: toNum, detectPlatform: detectPlatform, label: label,
-    canTakeover: canTakeover, normStatus: normStatus, kstDate: kstDate, okDate: okDate, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, analyzeIg: analyzeIg, tierOf: tierOf, ANA: ANA, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, remove: remove
+    canTakeover: canTakeover, normStatus: normStatus, kstDate: kstDate, okDate: okDate, parseIgDesc: parseIgDesc, parseIgHtml: parseIgHtml, guessCategory: guessCategory, analyzeIg: analyzeIg, tierOf: tierOf, ANA: ANA, parseIgHeader: parseIgHeader, cleanInfo: cleanInfo, mergeInfo: mergeInfo, refresh: refresh, normContact: normContact, add: add, bulk: bulk, update: update, transfer: transfer, markSent: markSent, markMail: markMail, remove: remove
   };
 })();
 
@@ -880,7 +916,13 @@ function renderInstall() {
   document.getElementById('instGo').onclick = installHelp;
   document.getElementById('instX').onclick = function () { localStorage.setItem('vl_inst_hide', '1'); renderInstall(); };
 }
-var S = { token: null, me: null, rows: [], settings: null, sheetUrl: '', tab: null, status: '전체', q: '', sort: 'recent', period: 'all', from: '', to: '', sel: {}, lastSync: 0, syncErr: false, loaded: false };
+var S = { token: null, me: null, rows: [], settings: null, sheetUrl: '', tab: null, status: '전체', q: '', sort: 'recent', period: 'all', from: '', to: '', sel: {}, lastSync: 0, syncErr: false, loaded: false, rev: '', lastFull: 0, limit: 60, dealWho: '전체' };
+var MQ_M = window.matchMedia ? window.matchMedia('(max-width:860px)') : { matches: false };
+function rowsSig(rows) { var s = rows.length + ':'; for (var i = 0; i < rows.length; i++) s += rows[i].id.slice(-5) + rows[i].version + ','; return s; }
+function mergeRows(changed, deleted) {
+  if (deleted && deleted.length) { var del = {}; deleted.forEach(function (id) { del[id] = 1; }); S.rows = S.rows.filter(function (r) { return !del[r.id]; }); }
+  if (changed && changed.length) { var ix = {}; S.rows.forEach(function (r, i) { ix[r.id] = i; }); changed.forEach(function (r) { if (ix[r.id] != null) S.rows[ix[r.id]] = r; else S.rows.unshift(r); }); }
+}
 
 /* ---------- utils ---------- */
 function $(s, el) { return (el || document).querySelector(s); }
@@ -930,7 +972,9 @@ function call(action, payload) {
       if (!res) return reject(new Error('응답이 없어요'));
       if (res.auth) { logout(true); return reject(new Error(res.error)); }
       if (!res.ok) return reject(new Error(res.error || '오류가 발생했어요'));
-      if (res.rows) { S.rows = res.rows; S.lastSync = Date.now(); }
+      if (res.rows) { S.rows = res.rows; S.lastSync = Date.now(); S.rev = ''; }
+      if (res.changed || res.deleted) { mergeRows(res.changed, res.deleted); S.lastSync = Date.now(); S.rev = (res.prevRev && S.rev && S.rev === res.prevRev) ? res.rev : ''; }
+      if (res.settings) S.settings = res.settings;
       resolve(res.data);
     };
     if (IS_GAS) google.script.run.withSuccessHandler(done).withFailureHandler(function (e) { reject(new Error(e && e.message || '서버 연결 실패')); }).api(S.token, action, payload || {});
@@ -983,6 +1027,7 @@ var Mock = {
     else if (action === 'update') res = VL.update(d.rows, p.id, p.patch || {}, p.version, me, now);
     else if (action === 'transfer') res = VL.transfer(d.rows, p.id, p.to, me, now);
     else if (action === 'markSent') res = VL.markSent(d.rows, p.ids || [], me, now, p.force);
+    else if (action === 'markMail') res = VL.markMail(d.rows, p.ids || [], me, now, !!p.clear);
     else if (action === 'remove') res = VL.remove(d.rows, p.id, me);
     else if (action === 'saveSettings') { Object.assign(d.settings, p); res = { ok: true }; }
     (res.ops || []).forEach(function (op) {
@@ -1052,7 +1097,7 @@ function renderShell() {
     '<div class="qc-row"><input id="qcIn" placeholder="인스타 프로필 링크 또는 @아이디" autocomplete="off" autocapitalize="off" enterkeyhint="go"><button class="btn primary" id="qcGo">등록</button></div>' +
     '<button class="btn yellow qc-paste" id="qcPaste">복사한 링크로 바로 등록</button>' +
     '<div class="qc-hint">이미 있는 계정이면 빨간색으로 알려드려요. PC에 <b>인스타 자동분석</b>을 켜 두면 링크만으로 팔로워·카테고리·참여율·평균 좋아요·최근 게시·협찬 이력·연락처까지 채워지고, 휴대폰으로 넣은 링크도 자동으로 분석돼요.</div><div class="qr" id="qcR"></div></div></div></section>' +
-    '<section id="groupbuyView" class="wrap hidden"></section><main class="wrap"><div class="chips" id="chips"></div>' +
+    '<section id="groupbuyView" class="wrap hidden"></section><section id="dealView" class="wrap hidden"></section><main class="wrap"><div class="chips" id="chips"></div>' +
     '<div class="toolbar"><div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="아이디, 이름, 연락처, 메모 검색" value="' + esc(S.q) + '"></div>' +
     '<select class="inp" id="period"><option value="all">기간 전체</option><option value="today">오늘</option><option value="7">최근 7일</option><option value="30">최근 30일</option><option value="month">이번 달</option><option value="custom">날짜 직접 선택</option></select>' +
     '<span id="custDates" class="hidden" style="display:inline-flex;gap:6px;align-items:center"><input type="date" class="inp" id="dFrom"> ~ <input type="date" class="inp" id="dTo"></span>' +
@@ -1065,7 +1110,7 @@ function renderShell() {
     '<button class="fab" id="fab" aria-label="등록">+</button>';
   renderInstall();
   $('#sort').value = S.sort;
-  $('#q').oninput = function () { S.q = this.value; renderList(); };
+  var _qt = 0; $('#q').oninput = function () { var v = this.value; clearTimeout(_qt); _qt = setTimeout(function () { S.q = v; renderList(); }, 220); };
   $('#sort').onchange = function () { S.sort = this.value; renderList(); };
   $('#period').value = S.period; $('#custDates').classList.toggle('hidden', S.period !== 'custom'); $('#dFrom').value = S.from; $('#dTo').value = S.to;
   $('#period').onchange = function () { S.period = this.value; $('#custDates').classList.toggle('hidden', S.period !== 'custom'); renderList(); };
@@ -1110,9 +1155,14 @@ function toggleMenu(e) {
 
 function sync(first) {
   if (!S.token) return Promise.resolve();
-  return call('list').then(function (d) {
-    S.rows = d.rows; S.settings = d.settings || {}; if (d.members) VL.setMembers(d.members); S.sheetUrl = d.sheetUrl || ''; S.lastSync = Date.now(); S.syncErr = false; S.loaded = true;
-    renderAll(); setTimeout(enrichQueue, 1000);
+  var useRev = !first && S.rev && (Date.now() - S.lastFull < 180000);
+  return call('list', useRev ? { rev: S.rev } : {}).then(function (d) {
+    S.lastSync = Date.now(); S.syncErr = false;
+    if (d.same) { renderSync(); return; }
+    var changed = !S.loaded || rowsSig(d.rows) !== rowsSig(S.rows) || JSON.stringify(d.settings || {}) !== JSON.stringify(S.settings || {});
+    S.rows = d.rows; S.settings = d.settings || {}; if (d.members) VL.setMembers(d.members); S.sheetUrl = d.sheetUrl || ''; S.loaded = true; S.rev = d.rev || ''; S.lastFull = Date.now();
+    if (changed && !$('#modal').innerHTML) renderAll(); else renderSync();
+    setTimeout(enrichQueue, 1000);
   }).catch(function (e) { S.syncErr = true; renderSync(); if (first) toast(e.message, true); });
 }
 function renderSync() {
@@ -1127,11 +1177,13 @@ function tabRows() { return S.tab === '전체' ? S.rows : S.rows.filter(function
 function renderTabs() {
   var cnt = function (m) { return m === '전체' ? S.rows.length : S.rows.filter(function (r) { return r.owner === m; }).length; };
   $('#tabs').innerHTML = ['전체'].concat(VL.MEMBERS).map(function (m) {
-    return '<button class="tab' + (S.tab === m && S.view !== 'groupbuy' ? ' on' : '') + '" data-t="' + m + '">' + (m === '전체' ? '' : '<span class="dot" style="background:' + mcolor(m) + '"></span>') + esc(m) + (m === S.me ? '<span class="me"> (나)</span>' : '') + '<span class="n">' + cnt(m) + '</span></button>';
-  }).join('') + '<button class="tab' + (S.view === 'groupbuy' ? ' on' : '') + '" id="groupbuyTab">공구 일정<span class="n">' + ((S.settings.groupbuySchedules || []).length) + '</span></button>';
+    return '<button class="tab' + (S.tab === m && !S.view ? ' on' : '') + '" data-t="' + m + '">' + (m === '전체' ? '' : '<span class="dot" style="background:' + mcolor(m) + '"></span>') + esc(m) + (m === S.me ? '<span class="me"> (나)</span>' : '') + '<span class="n">' + cnt(m) + '</span></button>';
+  }).join('') + '<button class="tab' + (S.view === 'groupbuy' ? ' on' : '') + '" id="groupbuyTab">공구 일정<span class="n">' + ((S.settings.groupbuySchedules || []).length) + '</span></button>' +
+    '<button class="tab' + (S.view === 'deals' ? ' on' : '') + '" id="dealsTab">샘플·공구<span class="n">' + S.rows.filter(function (r) { return /공구관심|샘플발송|진행중|완료/.test(r.stage || ''); }).length + '</span></button>';
   $$('#tabs .tab[data-t]').forEach(function (b) { b.onclick = function () { S.view = ''; S.tab = b.dataset.t; S.status = '전체'; S.sel = {}; renderAll(); }; });
-  $('#tabs').prepend($('#groupbuyTab'));
+  $('#tabs').prepend($('#dealsTab')); $('#tabs').prepend($('#groupbuyTab'));
   $('#groupbuyTab').onclick = function () { S.view = 'groupbuy'; renderAll(); };
+  $('#dealsTab').onclick = function () { S.view = 'deals'; renderAll(); };
 }
 function showAllApproved() {
   S.view = ''; S.tab = '전체'; S.status = '승인'; S.sel = {}; S.q = ''; S.period = 'all'; S.from = ''; S.to = '';
@@ -1155,12 +1207,16 @@ function renderChips() {
   var fu = rows.filter(isFollowUp).length;
   $('#chips').innerHTML = items.map(function (x) { return '<button class="chip' + (S.status === x[0] ? ' on' : '') + '" data-s="' + x[0] + '">' + x[0] + ' <b>' + x[1] + '</b></button>'; }).join('') +
     '<button class="chip fu' + (S.status === '팔로업' ? ' on' : '') + '" data-s="팔로업">팔로업 필요 <b>' + fu + '</b></button>' +
+    '<button class="chip mail' + (S.status === '메일' ? ' on' : '') + '" data-s="메일">✉ 메일 보냄 <b>' + rows.filter(function (r) { return !!r.mailSentAt; }).length + '</b></button>' +
+    '<button class="chip gb' + (S.status === '관심' ? ' on' : '') + '" data-s="관심">공구 관심 <b>' + rows.filter(function (r) { return r.stage === '공구관심'; }).length + '</b></button>' +
     (S.status === '오늘발송' ? '<button class="chip on" data-s="오늘발송">오늘 제안</button>' : '');
   $$('#chips .chip').forEach(function (b) { b.onclick = function () { if (b.dataset.s === '승인') return showAllApproved(); S.status = b.dataset.s; S.sel = {}; renderChips(); renderList(); }; });
 }
 function visibleRows() {
   var rows = tabRows().slice(), st = S.status, q = S.q.trim().toLowerCase().replace(/^@/, '');
   if (st === '팔로업') rows = rows.filter(isFollowUp);
+  else if (st === '메일') rows = rows.filter(function (r) { return !!r.mailSentAt; });
+  else if (st === '관심') rows = rows.filter(function (r) { return r.stage === '공구관심'; });
   else if (st === '오늘발송') rows = rows.filter(function (r) { return r.dateProposed === todayKST() || isToday(r.lastContactAt); });
   else if (st !== '전체') rows = rows.filter(function (r) { return r.status === st; });
   if (S.period !== 'all') {
@@ -1196,40 +1252,77 @@ function computeSoftDup() {
   [byC, byH].forEach(function (g) { Object.keys(g).forEach(function (k) { if (g[k].length > 1) g[k].forEach(function (r) { _softDup[r.id] = g[k].filter(function (x) { return x.id !== r.id; }).map(function (x) { return handleLabel(x) + '(' + x.owner + ')'; }).join(', '); }); }); });
 }
 function isRed(r) { return !!_softDup[r.id] || Number(r.dupHits) > 0; }
+function dealTag(r) {
+  var t = '';
+  if (r.mailSentAt) t += '<span class="tag mail" title="' + esc((r.mailSentBy || '') + ' 메일 발송') + '">✉ ' + fmtYMD(r.mailSentAt) + '</span>';
+  if (r.stage && r.stage !== '영업대기') t += '<span class="tag stg stg-' + esc(r.stage) + '">' + esc(r.stage) + '</span>';
+  return t;
+}
+function mailBtn(r) {
+  if (r.owner !== S.me && !isAppAdmin()) return '';
+  return '<button class="btn sm mailbtn' + (r.mailSentAt ? ' on' : '') + '" data-mail="' + r.id + '" title="' + (r.mailSentAt ? '메일 발송 기록 지우기' : '오늘 메일 보냄으로 기록') + '">' + (r.mailSentAt ? '✉ 보냄' : '✉ 메일') + '</button>';
+}
+function toggleMail(id) {
+  var r = byId(id); if (!r) return;
+  var clear = !!r.mailSentAt;
+  if (clear && !confirm('@' + r.handle + ' 메일 발송 기록을 지울까요?')) return;
+  call('markMail', { ids: [id], clear: clear }).then(function (d) { if (d.skipped && d.skipped.length) toast(d.skipped[0].reason, true); else toast(clear ? '메일 기록을 지웠어요' : '메일 보냄으로 기록했어요 (' + fmtYMD(todayKST()) + ')'); renderAll(); }).catch(function (e) { toast(e.message, true); });
+}
 function renderList() {
+  if (S.view) return;
+  if (!S.loaded) { $('#list').innerHTML = '<div class="empty"><span class="spin"></span> 불러오는 중</div>'; return; }
   computeSoftDup();
   var rows = visibleRows();
-  if (!S.loaded) { $('#list').innerHTML = '<div class="empty"><span class="spin"></span> 불러오는 중</div>'; return; }
+  var lk = [S.tab, S.status, S.q, S.period, S.from, S.to, S.sort].join('|');
+  if (lk !== S._lk) { S._lk = lk; S.limit = 60; }
   if (!rows.length) {
-    $('#list').innerHTML = '<div class="empty"><b>' + (S.q ? '검색 결과가 없어요' : '아직 등록된 인플루언서가 없어요') + '</b>' + (S.q ? '다른 단어로 찾아보거나 새로 등록하세요.' : '오른쪽 위 "+ 인플루언서 등록" 또는 "엑셀로 일괄등록"으로 시작하세요.') + '</div>';
+    $('#list').innerHTML = '<div class="empty"><b>' + (S.q ? '검색 결과가 없어요' : (S.status === '메일' ? '메일 보낸 기록이 아직 없어요' : '아직 등록된 인플루언서가 없어요')) + '</b>' + (S.q ? '다른 단어로 찾아보거나 새로 등록하세요.' : (S.status === '메일' ? '목록의 ✉ 메일 버튼을 누르면 여기에 모여요.' : '오른쪽 위 "+ 인플루언서 등록" 또는 "엑셀로 일괄등록"으로 시작하세요.')) + '</div>';
     renderSelbar(); return;
   }
+  var shown = rows.slice(0, S.limit), mobile = MQ_M.matches;
   var allSel = rows.every(function (r) { return S.sel[r.id]; });
-  var html = '<table class="tbl"><thead><tr><th style="width:40px"><input type="checkbox" class="cb" id="selAll"' + (allSel ? ' checked' : '') + '></th><th>계정</th><th>팔로워</th><th>참여율</th><th>카테고리</th><th>담당자</th><th>상태</th><th>최근 연락</th><th style="width:120px"></th></tr></thead><tbody>' +
-    rows.map(function (r) {
-      return '<tr data-id="' + r.id + '" class="' + (S.sel[r.id] ? 'sel' : '') + (isRed(r) ? ' dup' : '') + '"><td><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + '></td>' +
-        '<td><div class="acc">' + pfIcon(r.platform) + '<div><div class="h">' + esc(handleLabel(r)) + tags(r) + '</div><div class="nm">' + esc(r.name || '') + '</div></div></div></td>' +
-        '<td><b>' + fmtF(r.followers) + '</b>' + (r.tier ? '<div class="muted">' + esc(r.tier) + '</div>' : '') + '</td><td>' + (r.engRate !== '' && r.engRate != null ? '<b>' + r.engRate + '%</b>' : (r.platform === '인스타그램' && !r.analyzedAt && EXT.ok ? '<span class="muted">분석 대기</span>' : '-')) + '</td><td>' + esc(r.category || '-') + '</td>' +
-        '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td><span data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</span><div class="sdate">' + fmtYMD(stageDate(r)) + '</div></td>' +
-        '<td><div>' + fmtD(r.lastContactAt) + '</div>' + (r.contactCount ? '<div class="muted">' + r.contactCount + '회 연락</div>' : '') + '</td>' +
-        '<td><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button></td></tr>';
-    }).join('') + '</tbody></table>';
-  html += '<div class="cards">' + rows.map(function (r) {
-    return '<div class="card' + (S.sel[r.id] ? ' sel' : '') + (isRed(r) ? ' dup' : '') + '" data-id="' + r.id + '"><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + ' style="margin-top:6px">' +
-      '<div style="min-width:0"><div class="acc">' + pfIcon(r.platform) + '<div style="min-width:0"><div class="h">' + esc(handleLabel(r)) + '</div><div class="nm">' + esc(r.name || '') + tags(r) + '</div></div></div>' +
-      '<div class="meta"><span>팔로워 <b>' + fmtF(r.followers) + '</b></span>' + (r.engRate !== '' && r.engRate != null ? '<span>참여율 <b>' + r.engRate + '%</b></span>' : '') + '<span>' + esc(r.category || '카테고리 없음') + '</span><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span><span>연락 ' + fmtD(r.lastContactAt) + '</span></div></div>' +
-      '<div data-stg="' + r.id + '">' + badge(r.status).replace('class="badge', 'class="badge' + (r.owner === S.me ? ' click' : '')) + '</div><div class="acts"><button class="btn sm" data-msg="' + r.id + '">멘트 생성</button><button class="btn sm" data-open="' + r.id + '">상세</button></div></div>';
-  }).join('') + '</div>';
+  var html;
+  if (!mobile) {
+    html = '<table class="tbl"><thead><tr><th style="width:40px"><input type="checkbox" class="cb" id="selAll"' + (allSel ? ' checked' : '') + '></th><th>계정</th><th>팔로워</th><th>참여율</th><th>카테고리</th><th>담당자</th><th>상태</th><th>최근 연락</th><th style="width:170px"></th></tr></thead><tbody>' +
+      shown.map(function (r) {
+        return '<tr data-id="' + r.id + '" class="' + (S.sel[r.id] ? 'sel' : '') + (isRed(r) ? ' dup' : '') + '"><td><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + '></td>' +
+          '<td><div class="acc">' + pfIcon(r.platform) + '<div><div class="h">' + esc(handleLabel(r)) + tags(r) + '</div><div class="nm">' + esc(r.name || '') + dealTag(r) + '</div></div></div></td>' +
+          '<td><b>' + fmtF(r.followers) + '</b>' + (r.tier ? '<div class="muted">' + esc(r.tier) + '</div>' : '') + '</td><td>' + (r.engRate !== '' && r.engRate != null ? '<b>' + r.engRate + '%</b>' : (r.platform === '인스타그램' && !r.analyzedAt && EXT.ok ? '<span class="muted">분석 대기</span>' : '-')) + '</td><td>' + esc(r.category || '-') + '</td>' +
+          '<td><span class="who">' + av(r.owner, 24) + esc(r.owner) + '</span></td><td><span data-stg="' + r.id + '">' + stBadge(r) + '</span><div class="sdate">' + fmtYMD(stageDate(r)) + '</div></td>' +
+          '<td><div>' + fmtD(r.lastContactAt) + '</div>' + (r.contactCount ? '<div class="muted">' + r.contactCount + '회 연락</div>' : '') + '</td>' +
+          '<td><div class="rowacts">' + mailBtn(r) + '<button class="btn sm" data-msg="' + r.id + '">멘트</button></div></td></tr>';
+      }).join('') + '</tbody></table>';
+  } else {
+    html = '<div class="cards">' + shown.map(function (r) {
+      return '<div class="card' + (S.sel[r.id] ? ' sel' : '') + (isRed(r) ? ' dup' : '') + '" data-id="' + r.id + '"><input type="checkbox" class="cb rowcb" data-id="' + r.id + '"' + (S.sel[r.id] ? ' checked' : '') + ' style="margin-top:6px">' +
+        '<div style="min-width:0"><div class="acc">' + pfIcon(r.platform) + '<div style="min-width:0"><div class="h">' + esc(handleLabel(r)) + '</div><div class="nm">' + esc(r.name || '') + tags(r) + dealTag(r) + '</div></div></div>' +
+        '<div class="meta"><span>팔로워 <b>' + fmtF(r.followers) + '</b></span>' + (r.engRate !== '' && r.engRate != null ? '<span>참여율 <b>' + r.engRate + '%</b></span>' : '') + '<span>' + esc(r.category || '카테고리 없음') + '</span><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span><span>연락 ' + fmtD(r.lastContactAt) + '</span></div></div>' +
+        '<div data-stg="' + r.id + '">' + stBadge(r) + '</div><div class="acts">' + mailBtn(r) + '<button class="btn sm" data-msg="' + r.id + '">멘트</button><button class="btn sm" data-open="' + r.id + '">상세</button></div></div>';
+    }).join('') + '</div>';
+  }
+  if (rows.length > shown.length) html += '<div class="more"><button class="btn" id="moreBtn">더 보기 <b>' + Math.min(60, rows.length - shown.length) + '</b>명 <span class="muted">(남은 ' + (rows.length - shown.length) + '명)</span></button></div>';
+  else if (rows.length > 60) html += '<div class="more muted">' + rows.length + '명 모두 표시했어요</div>';
   $('#list').innerHTML = html;
-  $$('#list tbody tr').forEach(function (tr) { tr.onclick = function (e) { if (e.target.closest('input,button,[data-stg]')) return; openDetail(tr.dataset.id); }; });
-  $$('#list .card').forEach(function (c) { c.onclick = function (e) { if (e.target.closest('input,button,[data-stg]')) return; openDetail(c.dataset.id); }; });
-  $$('[data-msg]').forEach(function (b) { b.onclick = function () { openDetail(b.dataset.msg, 'msg'); }; });
-  $$('[data-stg]').forEach(function (s) { s.onclick = function (e) { e.stopPropagation(); var r = byId(s.dataset.stg); if (!r) return; if (r.owner !== S.me) { toast(r.owner + '님 담당이에요', true); return; } openStagePop(r, s); }; });
-  $$('[data-open]').forEach(function (b) { b.onclick = function () { openDetail(b.dataset.open); }; });
-  $$('.rowcb').forEach(function (c) { c.onchange = function () { if (c.checked) S.sel[c.dataset.id] = 1; else delete S.sel[c.dataset.id]; renderList(); }; });
-  var sa = $('#selAll'); if (sa) sa.onchange = function () { rows.forEach(function (r) { if (sa.checked) S.sel[r.id] = 1; else delete S.sel[r.id]; }); renderList(); };
+  var list = $('#list');
+  list.onclick = function (e) {
+    var t = e.target;
+    var b = t.closest('[data-mail]'); if (b) { e.stopPropagation(); toggleMail(b.dataset.mail); return; }
+    b = t.closest('[data-msg]'); if (b) { openDetail(b.dataset.msg, 'msg'); return; }
+    b = t.closest('[data-open]'); if (b) { openDetail(b.dataset.open); return; }
+    b = t.closest('[data-stg]'); if (b) { e.stopPropagation(); var r = byId(b.dataset.stg); if (!r) return; if (r.owner !== S.me) { toast(r.owner + '님 담당이에요', true); return; } openStagePop(r, b); return; }
+    if (t.id === 'moreBtn' || t.closest('#moreBtn')) { S.limit += 60; renderList(); return; }
+    if (t.closest('input,button,a')) return;
+    var row = t.closest('tr[data-id],.card[data-id]'); if (row) openDetail(row.dataset.id);
+  };
+  list.onchange = function (e) {
+    var c = e.target;
+    if (c.id === 'selAll') { rows.forEach(function (r) { if (c.checked) S.sel[r.id] = 1; else delete S.sel[r.id]; }); $$('#list .rowcb').forEach(function (x) { x.checked = c.checked; var p = x.closest('tr,.card'); if (p) p.classList.toggle('sel', c.checked); }); renderSelbar(); return; }
+    if (c.classList.contains('rowcb')) { if (c.checked) S.sel[c.dataset.id] = 1; else delete S.sel[c.dataset.id]; var p = c.closest('tr,.card'); if (p) p.classList.toggle('sel', c.checked); var sa = $('#selAll'); if (sa) sa.checked = rows.every(function (r) { return S.sel[r.id]; }); renderSelbar(); }
+  };
   renderSelbar();
 }
+function stBadge(r) { return '<span class="badge st-' + esc(r.status) + (r.owner === S.me ? ' click' : '') + '">' + esc(r.status) + '</span>'; }
+if (MQ_M.addEventListener) MQ_M.addEventListener('change', function () { if (S.loaded && !S.view) renderList(); });
 function selRows() { return S.rows.filter(function (r) { return S.sel[r.id]; }); }
 function renderSelbar() {
   var bar = $('#selbar'), sel = selRows();
@@ -1241,11 +1334,13 @@ function renderSelbar() {
     '<select id="selTpl">' + (tpls.length ? tpls.map(function (t) { return '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>'; }).join('') : '<option value="">내 멘트 없음</option>') + '</select>' +
     '<button class="btn sm yellow" id="selXls">멘트 엑셀로 열기</button>' +
     '<button class="btn sm" id="selSent"' + (mine.length ? '' : ' disabled') + '>제안중으로 표시 (' + mine.length + ')</button>' +
+    '<button class="btn sm" id="selMail"' + (mine.length ? '' : ' disabled') + '>✉ 메일 보냄 표시 (' + mine.length + ')</button>' +
     '<select id="selSt"' + (mine.length ? '' : ' disabled') + '><option value="">상태 변경</option>' + VL.STATUSES.map(function (s) { return '<option>' + s + '</option>'; }).join('') + '</select>' +
     '<button class="btn sm" id="selClr" style="margin-left:auto">선택 해제</button>';
   $('#selClr').onclick = function () { S.sel = {}; renderList(); };
   $('#selXls').onclick = function () { var t = tpls.filter(function (x) { return x.id === $('#selTpl').value; })[0]; if (!t) return toast('멘트 설정에서 내 멘트를 먼저 만들어 주세요', true); exportMessages(sel, t); };
   $('#selSent').onclick = function () { markSent(mine.map(function (r) { return r.id; })); };
+  $('#selMail').onclick = function () { call('markMail', { ids: mine.map(function (r) { return r.id; }) }).then(function (d) { toast(d.done.length + '명을 메일 보냄으로 기록했어요'); S.sel = {}; renderAll(); }).catch(function (e) { toast(e.message, true); }); };
   $('#selSt').onchange = function () {
     var st = this.value; if (!st) return;
     var jobs = mine.map(function (r) { return function () { return call('update', { id: r.id, patch: { status: st }, version: r.version }); }; });
@@ -1531,7 +1626,7 @@ function openDetail(id, tab) {
   var r = byId(id); if (!r) return toast('항목을 찾을 수 없어요', true);
   tab = tab || 'info';
   var mine = r.owner === S.me, canEdit = mine || isAppAdmin();
-  var tabsHtml = '<div class="mtabs"><button data-mt="info"' + (tab === 'info' ? ' class="on"' : '') + '>정보·상태</button><button data-mt="msg"' + (tab === 'msg' ? ' class="on"' : '') + '>멘트·제안서</button><button data-mt="deal"' + (tab === 'deal' ? ' class="on"' : '') + '>샘플·진행</button></div>';
+  var tabsHtml = '<div class="mtabs"><button data-mt="info"' + (tab === 'info' ? ' class="on"' : '') + '>정보·상태</button><button data-mt="msg"' + (tab === 'msg' ? ' class="on"' : '') + '>멘트·제안서</button><button data-mt="deal"' + (tab === 'deal' ? ' class="on"' : '') + '>공구·샘플</button></div>';
   var pre = '<div class="acc" style="margin-bottom:4px">' + pfIcon(r.platform) + '<span class="who">' + av(r.owner, 22) + esc(r.owner) + ' 담당</span>' + badge(r.status) + '</div>';
   var title = esc(handleLabel(r)) + ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener" style="font-size:14px;font-weight:700">프로필 열기 ↗</a>';
   var lock = canEdit ? (mine ? '' : '<div class="notice info">관리자 권한으로 정보를 수정할 수 있어요. DM 발송은 담당자만 가능합니다.</div>') : '<div class="notice lock"><b>' + esc(r.owner) + '님 담당</b>이에요. 중복 연락을 막기 위해 수정·발송은 담당자만 할 수 있어요.' +
@@ -1560,11 +1655,17 @@ function openDetail(id, tab) {
   } else if (tab === 'deal') {
     var dis2 = canEdit ? '' : ' disabled', stg = r.stage || '';
     var fld = function (lb, fid, v, ph, typ) { return '<div class="fld"><label>' + lb + '</label><input class="inp" ' + (typ ? 'type="' + typ + '" ' : '') + 'id="' + fid + '" value="' + esc(v || '') + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + dis2 + '></div>'; };
-    body = lock + '<div class="fld full"><label>진행 단계</label><div class="seg" id="gSt" style="flex-wrap:wrap">' + [''].concat(VL.DEAL_STAGES).map(function (s2) { return '<button data-g="' + s2 + '"' + (s2 === stg ? ' class="on"' : '') + dis2 + '>' + (s2 || '해당 없음') + '</button>'; }).join('') + '</div></div>' +
+    var cmv0 = pctNum(r.commission), cmMode = !cmv0 ? '' : (cmv0 === 25 || cmv0 === 30 ? String(cmv0) : 'etc'), fyn = r.writeFeeYN || '';
+    var sb = function (id, val, cur, label) { return '<button data-v="' + val + '"' + (val === cur ? ' class="on"' : '') + dis2 + '>' + label + '</button>'; };
+    body = lock + '<div class="deal-flow"><span' + (r.mailSentAt ? ' class="done"' : '') + '>① 영업·메일</span><span' + (/공구관심|샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>② 공구 관심</span><span' + (/샘플발송|진행중|완료/.test(stg) ? ' class="done"' : '') + '>③ 샘플 발송 (오종호)</span><span' + (/진행중|완료/.test(stg) ? ' class="done"' : '') + '>④ 공구 진행</span></div>' +
+      '<div class="dealbox"><div class="fld"><label>영업 메일</label><div class="mailrow"><input type="date" class="inp" id="gMail" value="' + esc(r.mailSentAt || '') + '"' + dis2 + '><button class="btn sm" id="gMailToday"' + dis2 + '>오늘 보냄</button></div>' + (r.mailSentBy ? '<div class="muted">' + esc(r.mailSentBy) + ' 기록</div>' : '') + '</div>' +
+      '<div class="fld"><label>수수료율</label><div class="seg" id="gCmSeg">' + sb('gCmSeg', '25', cmMode, '25%') + sb('gCmSeg', '30', cmMode, '30%') + sb('gCmSeg', 'etc', cmMode, '직접') + '</div><input class="inp' + (cmMode === 'etc' ? '' : ' hidden') + '" id="gCm" inputmode="decimal" style="margin-top:6px" placeholder="예: 27" value="' + esc(cmMode === 'etc' ? r.commission : (cmv0 || '')) + '"' + dis2 + '></div>' +
+      '<div class="fld"><label>원고료</label><div class="seg" id="gFySeg">' + sb('gFySeg', '없음', fyn, '없음') + sb('gFySeg', '있음', fyn, '있음') + '</div><div class="wonrow' + (fyn === '있음' ? '' : ' hidden') + '" id="gFeeRow"><input class="inp" id="gFee" inputmode="numeric" placeholder="금액" value="' + (num(r.writeFee) ? num(r.writeFee).toLocaleString() : '') + '"' + dis2 + '><span>원</span></div></div></div>' +
+      '<div class="fld full" style="margin-top:12px"><label>진행 단계</label><div class="seg" id="gSt" style="flex-wrap:wrap">' + [''].concat(VL.DEAL_STAGES).map(function (s2) { return '<button data-g="' + s2 + '"' + (s2 === stg ? ' class="on"' : '') + dis2 + '>' + (s2 || '해당 없음') + '</button>'; }).join('') + '</div><div class="muted" style="margin-top:4px">공구에 관심 있다고 하면 <b>공구관심</b>으로 바꿔 주세요. 오종호님 샘플 발송 목록에 바로 올라가요.</div></div>' +
       '<div class="grid2" style="margin-top:12px">' + fld('수령인 이름', 'gRn', r.recvName) + fld('수령인 연락처', 'gRp', r.recvPhone, '010-0000-0000') +
       '<div class="fld full"><label>배송 주소</label><input class="inp" id="gRa" value="' + esc(r.recvAddr || '') + '"' + dis2 + '></div>' +
       fld('샘플 품목·수량', 'gIt', r.sampleItem, '예: 14병 1박스') + fld('샘플 발송일', 'gSd', r.dateSample, '', 'date') + fld('송장번호', 'gTr', r.tracking) + fld('공구 시작일', 'gGs', r.dateGbStart, '', 'date') + fld('공구 종료일', 'gGe', r.dateGbEnd, '', 'date') +
-      fld('수수료(%)', 'gCm', r.commission, '예: 20') + fld('매출(원)', 'gSa', num(r.sales) ? num(r.sales).toLocaleString() : '', '예: 3,500,000') + '</div>' +
+      fld('매출(원)', 'gSa', num(r.sales) ? num(r.sales).toLocaleString() : '', '예: 3,500,000') + '</div>' +
       '<div class="notice info" style="margin-top:12px" id="gCalc"></div><div class="muted" style="margin-top:6px">받는 사람 정보는 배송용 개인정보예요. 공구가 끝나 필요 없어지면 지워 주세요.</div>';
     foot = canEdit ? '<span style="flex:1"></span><button class="btn" data-close>닫기</button><button class="btn primary" id="gSave">저장</button>' : '<button class="btn primary" data-close>닫기</button>';
   } else {
@@ -1586,14 +1687,21 @@ function openDetail(id, tab) {
   var tk = $('#dTake'); if (tk) tk.onclick = function () { call('transfer', { id: id, to: S.me }).then(function (d) { if (!d.ok) return toast(d.error, true); toast('내 담당으로 가져왔어요'); renderAll(); openDetail(id, tab); }).catch(function (e) { toast(e.message, true); }); };
   if (tab === 'deal') {
     var g = r.stage || '';
-    var calc = function () { var sa = num($('#gSa').value), cm = pctNum($('#gCm').value); $('#gCalc').innerHTML = '매출 <b>' + (sa ? sa.toLocaleString() + '원' : '-') + '</b> · 수수료 ' + (cm ? cm + '%' : '-') + ' → 예상 수수료 <b>' + (sa && cm ? Math.round(sa * cm / 100).toLocaleString() + '원' : '-') + '</b>'; };
-    calc(); $('#gSa').oninput = calc; $('#gCm').oninput = calc;
+    var cmSel = cmMode, fySel = fyn;
+    var curCm = function () { return cmSel === 'etc' ? pctNum($('#gCm').value) : (cmSel ? Number(cmSel) : 0); };
+    var calc = function () { var sa = num($('#gSa').value), cm = curCm(), fee = fySel === '있음' ? num($('#gFee').value) : 0; $('#gCalc').innerHTML = '매출 <b>' + (sa ? sa.toLocaleString() + '원' : '-') + '</b> · 수수료 ' + (cm ? cm + '%' : '-') + ' → 예상 수수료 <b>' + (sa && cm ? Math.round(sa * cm / 100).toLocaleString() + '원' : '-') + '</b>' + (fySel === '있음' ? ' · 원고료 <b>' + (fee ? fee.toLocaleString() + '원' : '금액 미입력') + '</b>' : (fySel === '없음' ? ' · 원고료 없음' : '')); };
+    calc(); $('#gSa').oninput = calc; $('#gCm').oninput = calc; $('#gFee').oninput = function () { var v = num(this.value); this.value = v ? v.toLocaleString() : ''; calc(); };
+    if (canEdit) {
+      $$('#gCmSeg button').forEach(function (b) { b.onclick = function () { cmSel = b.dataset.v; $$('#gCmSeg button').forEach(function (x) { x.classList.toggle('on', x === b); }); $('#gCm').classList.toggle('hidden', cmSel !== 'etc'); if (cmSel === 'etc') $('#gCm').focus(); calc(); }; });
+      $$('#gFySeg button').forEach(function (b) { b.onclick = function () { fySel = b.dataset.v; $$('#gFySeg button').forEach(function (x) { x.classList.toggle('on', x === b); }); $('#gFeeRow').classList.toggle('hidden', fySel !== '있음'); if (fySel === '있음') $('#gFee').focus(); calc(); }; });
+      $('#gMailToday').onclick = function () { $('#gMail').value = todayKST(); };
+    }
     if (canEdit) {
       $$('#gSt button').forEach(function (b) { b.onclick = function () { g = b.dataset.g; $$('#gSt button').forEach(function (x) { x.classList.toggle('on', x === b); }); if (g === '샘플발송' && !$('#gSd').value) $('#gSd').value = todayKST(); if (g === '진행중' && !$('#gGs').value) $('#gGs').value = todayKST(); }; });
       $('#gSave').onclick = function () {
         var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
-        var sa = num($('#gSa').value), cmv = pctNum($('#gCm').value);
-        var patch = { stage: g, recvName: $('#gRn').value, recvPhone: $('#gRp').value, recvAddr: $('#gRa').value, sampleItem: $('#gIt').value, dateSample: $('#gSd').value, tracking: $('#gTr').value, dateGbStart: $('#gGs').value, dateGbEnd: $('#gGe').value, commission: cmv ? String(cmv) : '', sales: sa ? String(sa) : '' };
+        var sa = num($('#gSa').value), cmv = curCm();
+        var patch = { mailSentAt: $('#gMail').value, writeFeeYN: fySel, writeFee: fySel === '있음' ? String(num($('#gFee').value) || '') : '', stage: g, recvName: $('#gRn').value, recvPhone: $('#gRp').value, recvAddr: $('#gRa').value, sampleItem: $('#gIt').value, dateSample: $('#gSd').value, tracking: $('#gTr').value, dateGbStart: $('#gGs').value, dateGbEnd: $('#gGe').value, commission: cmv ? String(cmv) : '', sales: sa ? String(sa) : '' };
         call('update', { id: id, patch: patch, version: r.version }).then(function (d) {
           if (!d.ok) { toast(d.error, true); renderAll(); if (d.conflict) openDetail(id, 'deal'); else { btn.disabled = false; btn.textContent = '저장'; } return; }
           toast('저장했어요'); renderAll(); openDetail(id, 'deal');
@@ -1848,7 +1956,7 @@ function openExport(preset) {
 /* ---------- 샘플·진행 관리 ---------- */
 function num(v) { var n = Number(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return isFinite(n) ? Math.round(n) : 0; }
 function pctNum(v) { var n = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return isFinite(n) ? n : 0; }
-var DEAL_ORDER = { '영업대기': 0, '샘플발송': 1, '진행중': 2, '완료': 3 };
+var DEAL_ORDER = { '영업대기': 0, '공구관심': 1, '샘플발송': 2, '진행중': 3, '완료': 4 };
 function dealStats(base) {
   var deals = base.filter(function (r) { return r.stage; });
   var cnt = function (s) { return deals.filter(function (r) { return r.stage === s; }).length; };
@@ -1871,7 +1979,7 @@ function openDeals(who) {
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' + card('제안 → 샘플 전환', st.pct(st.sampled), '제안 ' + st.proposed + '명 중 ' + st.sampled + '명') + card('제안 → 진행 전환', st.pct(st.running), '진행·완료 ' + st.running + '명') + card('총 매출', st.sales ? st.sales.toLocaleString() + '원' : '-', '평균 수수료 ' + (st.avgCm ? st.avgCm + '%' : '-')) + card('예상 수수료 합계', st.fee ? st.fee.toLocaleString() + '원' : '-', '매출 × 수수료%') + '</div>' +
     (st.deals.length ? '<div style="overflow-x:auto;margin-top:14px"><table class="mini" style="min-width:980px"><tr><th>단계</th><th>담당</th><th>인스타</th><th>이름</th><th>수령인</th><th>연락처</th><th>배송 주소</th><th>샘플</th><th>발송일</th><th>송장</th><th>공구 기간</th><th>수수료</th><th>매출</th></tr>' +
       st.deals.map(function (r) { return '<tr data-id="' + esc(r.id) + '" style="cursor:pointer"><td><b>' + esc(r.stage) + '</b></td><td>' + esc(r.owner) + '</td><td>@' + esc(r.handle) + '</td><td>' + esc(r.name || '') + '</td><td>' + esc(r.recvName || '') + '</td><td>' + esc(r.recvPhone || '') + '</td><td>' + esc(r.recvAddr || '') + '</td><td>' + esc(r.sampleItem || '') + '</td><td>' + esc(r.dateSample || '') + '</td><td>' + esc(r.tracking || '') + '</td><td>' + esc((r.dateGbStart || '') + (r.dateGbEnd ? ' ~ ' + r.dateGbEnd : '')) + '</td><td>' + (pctNum(r.commission) ? pctNum(r.commission) + '%' : '') + '</td><td>' + (num(r.sales) ? num(r.sales).toLocaleString() : '') + '</td></tr>'; }).join('') + '</table></div><div class="muted" style="margin-top:6px">줄을 누르면 상세 화면에서 바로 수정할 수 있어요.</div>'
-      : '<div class="notice info" style="margin-top:14px">아직 샘플·진행 단계로 넘어간 사람이 없어요. 인플루언서를 눌러 <b>샘플·진행</b> 탭에서 단계와 받는 사람 정보를 넣으면 여기에 모여요.</div>');
+      : '<div class="notice info" style="margin-top:14px">아직 공구·샘플 단계로 넘어간 사람이 없어요. 인플루언서를 눌러 <b>공구·샘플</b> 탭에서 단계와 받는 사람 정보를 넣으면 여기에 모여요.</div>');
   openModal('샘플·진행 관리', body, '<span style="flex:1"></span><button class="btn" data-close>닫기</button><button class="btn yellow" id="dlXls">엑셀 다운로드</button>', { wide: true });
   $$('#dlWho button').forEach(function (b) { b.onclick = function () { openDeals(b.dataset.w); }; });
   $$('tr[data-id]').forEach(function (tr) { tr.onclick = function () { openDetail(tr.dataset.id, 'deal'); }; });
@@ -1881,14 +1989,15 @@ function exportDeals(st, who) {
   return loadExcel().then(function (X) {
     var wb = new X.Workbook(); wb.creator = 'VERY LABEL';
     var ws = wb.addWorksheet('샘플·진행', { views: [{ state: 'frozen', ySplit: 3 }] });
-    var cols = [['No', 6], ['단계', 10], ['담당자', 10], ['인스타 아이디', 22], ['인스타 링크', 36], ['이름/닉네임', 18], ['팔로워', 11], ['카테고리', 13], ['수령인', 10], ['수령인 연락처', 15], ['배송 주소', 44], ['샘플 품목', 16], ['샘플 발송일', 12], ['송장번호', 16], ['공구 시작', 12], ['공구 종료', 12], ['수수료(%)', 10], ['매출(원)', 14], ['예상 수수료(원)', 15], ['제안일', 12], ['연락처(DM/메일)', 24], ['메모', 40]];
+    var cols = [['No', 6], ['단계', 10], ['담당자', 10], ['인스타 아이디', 22], ['인스타 링크', 36], ['이름/닉네임', 18], ['팔로워', 11], ['카테고리', 13], ['수령인', 10], ['수령인 연락처', 15], ['배송 주소', 44], ['샘플 품목', 16], ['샘플 발송일', 12], ['송장번호', 16], ['공구 시작', 12], ['공구 종료', 12], ['수수료(%)', 10], ['매출(원)', 14], ['예상 수수료(원)', 15], ['제안일', 12], ['연락처(DM/메일)', 24], ['메모', 40], ['원고료 유무', 11], ['원고료(원)', 13], ['메일 발송일', 12], ['공구 관심일', 12]];
     titleRows(ws, '샘플·진행 관리 · ' + who, '내보낸 시각 ' + fmtStamp(new Date().toISOString()) + ' · ' + st.deals.length + '명 · 총매출 ' + st.sales.toLocaleString() + '원 · 제안→진행 ' + st.pct(st.running), cols.length);
     ws.getRow(3).values = cols.map(function (c) { return c[0]; });
     cols.forEach(function (c, i) { ws.getColumn(i + 1).width = c[1]; });
     styleHead(ws, 3);
     st.deals.forEach(function (r, i) {
       var sa = num(r.sales), cm = pctNum(r.commission);
-      var row = ws.addRow([i + 1, r.stage, r.owner, '@' + r.handle, r.url ? { text: r.url, hyperlink: r.url } : '', r.name || '', r.followers === '' ? '' : Number(r.followers), r.category || '', r.recvName || '', r.recvPhone || '', r.recvAddr || '', r.sampleItem || '', r.dateSample || '', r.tracking || '', r.dateGbStart || '', r.dateGbEnd || '', cm || '', sa || '', sa && cm ? Math.round(sa * cm / 100) : '', r.dateProposed || '', r.contact || '', r.memo || '']);
+      var row = ws.addRow([i + 1, r.stage, r.owner, '@' + r.handle, r.url ? { text: r.url, hyperlink: r.url } : '', r.name || '', r.followers === '' ? '' : Number(r.followers), r.category || '', r.recvName || '', r.recvPhone || '', r.recvAddr || '', r.sampleItem || '', r.dateSample || '', r.tracking || '', r.dateGbStart || '', r.dateGbEnd || '', cm || '', sa || '', sa && cm ? Math.round(sa * cm / 100) : '', r.dateProposed || '', r.contact || '', r.memo || '', r.writeFeeYN || '', num(r.writeFee) || '', r.mailSentAt || '', r.interestAt || '']);
+      row.getCell(24).numFmt = '#,##0';
       row.font = XL.font; row.alignment = { vertical: 'top', wrapText: true };
       [7, 18, 19].forEach(function (c) { row.getCell(c).numFmt = '#,##0'; });
       row.getCell(2).font = { name: '맑은 고딕', bold: true, size: 11 };
@@ -2027,7 +2136,45 @@ function openSettings() {
 }
 
 
-function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'), main=$('main.wrap'), view=$('#groupbuyView'); if(hero)hero.classList.toggle('hidden',gb);if(main)main.classList.toggle('hidden',gb);if(view)view.classList.toggle('hidden',!gb);var fab=$('#fab');if(fab)fab.classList.toggle('hidden',gb);if(gb)renderGroupbuyPage();}
+function renderGroupbuyState(){ var gb=S.view==='groupbuy', dl=S.view==='deals', any=gb||dl; var hero=$('.hero'), main=$('main.wrap'), view=$('#groupbuyView'), dv=$('#dealView'); if(hero)hero.classList.toggle('hidden',any);if(main)main.classList.toggle('hidden',any);if(view)view.classList.toggle('hidden',!gb);if(dv)dv.classList.toggle('hidden',!dl);var fab=$('#fab');if(fab)fab.classList.toggle('hidden',any);if(gb)renderGroupbuyPage();if(dl)renderDealBoard();}
+function sheetLink(kind) { var g = (S.settings.sheetGids || {})[kind]; return S.sheetUrl ? S.sheetUrl.split('#')[0] + (g != null ? '#gid=' + g : '') : ''; }
+function feeTxt(r) { return r.writeFeeYN === '있음' ? (num(r.writeFee) ? num(r.writeFee).toLocaleString() + '원' : '있음(금액 미정)') : (r.writeFeeYN === '없음' ? '없음' : '<span class="muted">미입력</span>'); }
+function renderDealBoard() {
+  var root = $('#dealView'); if (!root) return;
+  var who = S.dealWho || '전체', admin = isAppAdmin();
+  var base = S.rows.filter(function (r) { return /공구관심|샘플발송|진행중|완료/.test(r.stage || '') && (who === '전체' || r.owner === who); });
+  var secs = [['공구관심', '샘플 보낼 곳', '공구 관심이 확인된 인플루언서예요. 오종호님이 주소 확인 후 샘플을 보내요.'], ['샘플발송', '샘플 보냄', '샘플을 보낸 곳이에요. 송장과 공구 일정을 확인하세요.'], ['진행중', '공구 진행중', ''], ['완료', '공구 완료', '']];
+  var by = {}; secs.forEach(function (s) { by[s[0]] = base.filter(function (r) { return r.stage === s[0]; }).sort(function (a, b) { return String(b.interestAt || b.dateSample || b.updatedAt).localeCompare(String(a.interestAt || a.dateSample || a.updatedAt)); }); });
+  var mailCnt = S.rows.filter(function (r) { return r.mailSentAt && (who === '전체' || r.owner === who); }).length;
+  var tbl = function (st, list) {
+    if (!list.length) return '<div class="dempty">없음</div>';
+    if (MQ_M.matches) return list.map(function (r) {
+      return '<div class="dcard" data-id="' + r.id + '"><div class="dtop"><b>@' + esc(r.handle) + '</b><span class="who">' + av(r.owner, 18) + esc(r.owner) + '</span></div><div class="muted">' + esc(r.name || '') + ' · 팔로워 ' + fmtF(r.followers) + '</div>' +
+        '<div class="dkv"><span>수수료 <b>' + (pctNum(r.commission) ? pctNum(r.commission) + '%' : '-') + '</b></span><span>원고료 <b>' + feeTxt(r) + '</b></span>' + (r.mailSentAt ? '<span>메일 ' + fmtYMD(r.mailSentAt) + '</span>' : '') + '</div>' +
+        (st === '공구관심' ? '<div class="dkv">' + (r.recvAddr ? '<span class="okc">주소 있음</span>' : '<span class="warnc">주소 필요</span>') + (admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄 처리</button>' : '') + '</div>' : '<div class="dkv"><span>발송 ' + fmtYMD(r.dateSample) + '</span>' + (r.tracking ? '<span>송장 ' + esc(r.tracking) + '</span>' : '') + (r.dateGbStart ? '<span>공구 ' + fmtYMD(r.dateGbStart) + '~' + fmtYMD(r.dateGbEnd) + '</span>' : '') + '</div>') + '</div>';
+    }).join('');
+    return '<table class="tbl dtbl"><thead><tr><th>인플루언서</th><th>담당 영업자</th><th>수수료</th><th>원고료</th><th>메일</th>' + (st === '공구관심' ? '<th>관심 등록</th><th>받는 곳</th><th></th>' : '<th>샘플 발송</th><th>송장</th><th>공구 기간</th>' + (st === '진행중' || st === '완료' ? '<th>매출</th>' : '')) + '</tr></thead><tbody>' + list.map(function (r) {
+      return '<tr data-id="' + r.id + '"><td><div class="h">@' + esc(r.handle) + '</div><div class="nm">' + esc(r.name || '') + ' · ' + fmtF(r.followers) + '</div></td><td><span class="who">' + av(r.owner, 20) + esc(r.owner) + '</span></td>' +
+        '<td><b>' + (pctNum(r.commission) ? pctNum(r.commission) + '%' : '-') + '</b></td><td>' + feeTxt(r) + '</td><td>' + (r.mailSentAt ? fmtYMD(r.mailSentAt) : '-') + '</td>' +
+        (st === '공구관심' ? '<td>' + fmtYMD(r.interestAt) + '</td><td>' + (r.recvAddr ? '<span class="okc">' + esc(r.recvName || '주소 있음') + '</span>' : '<span class="warnc">주소 필요</span>') + '</td><td>' + (admin ? '<button class="btn sm primary" data-ship="' + r.id + '">샘플 보냄</button>' : '') + '</td>'
+          : '<td>' + fmtYMD(r.dateSample) + '</td><td>' + esc(r.tracking || '-') + '</td><td>' + (r.dateGbStart ? fmtYMD(r.dateGbStart) + ' ~ ' + fmtYMD(r.dateGbEnd) : '-') + '</td>' + (st === '진행중' || st === '완료' ? '<td>' + (num(r.sales) ? num(r.sales).toLocaleString() + '원' : '-') + '</td>' : '')) + '</tr>';
+    }).join('') + '</tbody></table>';
+  };
+  var dl = sheetLink('deals'), ml = sheetLink('mail');
+  root.innerHTML = '<div class="dhead"><div><h2>샘플·공구 현황</h2><p class="muted">영업자가 <b>공구관심</b>으로 바꾼 인플루언서를 오종호님이 보고 샘플을 보내요. 수수료·원고료는 각 인플루언서 상세의 <b>공구·샘플</b> 탭에서 입력해요.</p></div>' +
+    '<div class="dbtns">' + (dl ? '<a class="btn yellow" href="' + esc(dl) + '" target="_blank" rel="noopener">구글시트로 열기 ↗</a>' : '') + (ml ? '<a class="btn" href="' + esc(ml) + '" target="_blank" rel="noopener">메일 발송 기록 시트 ↗</a>' : '') + '<button class="btn" id="dXls">엑셀 다운로드</button></div></div>' +
+    '<div class="seg dwho" id="dWho">' + ['전체'].concat(VL.MEMBERS).map(function (m) { return '<button data-w="' + esc(m) + '"' + (m === who ? ' class="on"' : '') + '>' + esc(m) + '</button>'; }).join('') + '</div>' +
+    '<div class="dkpis">' + secs.map(function (s) { return '<a class="dkpi" href="#d-' + s[0] + '"><b>' + by[s[0]].length + '</b><span>' + s[1] + '</span></a>'; }).join('') + '<div class="dkpi"><b>' + mailCnt + '</b><span>메일 보낸 곳</span></div></div>' +
+    secs.map(function (s) { return '<section class="dsec" id="d-' + s[0] + '"><h3>' + s[1] + ' <span class="n">' + by[s[0]].length + '</span></h3>' + (s[2] ? '<p class="muted">' + s[2] + '</p>' : '') + tbl(s[0], by[s[0]]) + '</section>'; }).join('');
+  $$('#dWho button').forEach(function (b) { b.onclick = function () { S.dealWho = b.dataset.w; renderDealBoard(); }; });
+  $('#dXls').onclick = function () { openDeals(who); };
+  root.onclick = function (e) {
+    var b = e.target.closest('[data-ship]'); if (b) { e.stopPropagation(); openDetail(b.dataset.ship, 'deal'); setTimeout(function () { var sb = document.querySelector('#gSt button[data-g="샘플발송"]'); if (sb && !sb.classList.contains('on')) sb.click(); }, 60); return; }
+    if (e.target.closest('a,button')) return;
+    var row = e.target.closest('[data-id]'); if (row) openDetail(row.dataset.id, 'deal');
+  };
+}
+
 
 /* VERY LABEL group-buy UI. Classic script, load after the app globals.
  * Host supplies #groupbuyView and calls renderGroupbuyPage() from renderAll().
@@ -2388,7 +2535,7 @@ function renderGroupbuyState(){ var gb=S.view==='groupbuy'; var hero=$('.hero'),
   S.token = localStorage.getItem('vl_token');
   if (S.token) {
     S.me = IS_LIVE ? null : S.token.replace('preview-', '');
-    call('list').then(function (d) { S.me = d.me; S.rows = d.rows; S.settings = d.settings || {}; if (d.members) VL.setMembers(d.members); S.sheetUrl = d.sheetUrl || ''; S.loaded = true; S.lastSync = Date.now(); S.tab = d.me; renderShell(); renderAll(); runPending(); sendAuthToExt(); setTimeout(enrichQueue, 2000); setTimeout(checkClipboard, 800); })
+    call('list').then(function (d) { S.me = d.me; S.rows = d.rows; S.rev = d.rev || ''; S.lastFull = Date.now(); S.settings = d.settings || {}; if (d.members) VL.setMembers(d.members); S.sheetUrl = d.sheetUrl || ''; S.loaded = true; S.lastSync = Date.now(); S.tab = d.me; renderShell(); renderAll(); runPending(); sendAuthToExt(); setTimeout(enrichQueue, 2000); setTimeout(checkClipboard, 800); })
       .catch(function () { renderLogin(); });
   } else renderLogin();
   setInterval(function () { if (S.token && S.me && document.visibilityState === 'visible' && !$('#modal').innerHTML) sync(); else renderSync(); }, 20000);
